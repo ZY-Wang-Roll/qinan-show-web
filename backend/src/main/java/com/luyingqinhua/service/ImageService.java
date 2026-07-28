@@ -22,7 +22,7 @@ public class ImageService {
     @Value("${app.upload.path:./uploads}")
     private String uploadPath;
 
-    @Value("${app.site.base-url:http://localhost:8080}")
+    @Value("${app.site.base-url:}")
     private String baseUrl;
 
     public ImageService(UploadedImageRepository imageRepo) {
