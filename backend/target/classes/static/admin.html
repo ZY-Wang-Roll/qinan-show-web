@@ -921,7 +921,7 @@ function formatSize(bytes) { if (!bytes) return '0 B'; if (bytes<1024) return by
 
 // ==================== ROUTING ====================
 window.addEventListener('hashchange', () => {
-  if (Object.keys(SITE_DATA).length > 0) renderSection();
+  renderSection();
 });
 
 // ==================== INIT ====================
