@@ -1,16 +1,27 @@
 export function getImgSrc(path) {
   if (!path) return ""
-  // 如果已经是完整http链接，直接返回
   if (path.startsWith("http")) return path
-  // 开发环境补全后端地址；生产环境空（依靠nginx代理）
+
+  // 自动修复缺失前置斜杠的历史图片
+  let fixedPath = path
+  if (!fixedPath.startsWith("/")) {
+    fixedPath = "/" + fixedPath
+  }
+
   const base = import.meta.env.DEV ? "http://localhost:8080" : ""
-  return base + path
+  return base + fixedPath
 }
 
 export function getThumbSrc(path) {
   if (!path) return ""
   if (path.startsWith("http")) return path
+
+  let fixedPath = path
+  if (!fixedPath.startsWith("/")) {
+    fixedPath = "/" + fixedPath
+  }
+
   const base = import.meta.env.DEV ? "http://localhost:8080" : ""
-  const name = path.replace(/.*\//, "").replace(/\.[^.]+$/, "")
+  const name = fixedPath.replace(/.*\//, "").replace(/\.[^.]+$/, "")
   return base + "/uploads/thumb/" + name + ".webp"
 }
