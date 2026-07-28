@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鹿映秦华 · 内容管理后台</title>
+<style>
+:root {
+  --bg: #faf8f5; --surface: #fff; --fg: #1a1a1a; --muted: #5c534c;
+  --border: #e8e3dc; --accent: #c4a682; --accent-deep: #a88b6a;
+  --danger: #c44; --success: #5a8; --warm-50: #faf8f5;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: "PingFang SC","Noto Sans SC",system-ui,sans-serif; background:var(--bg); color:var(--fg); min-height:100vh; display:flex; flex-direction:column; }
+
+/* ========== HEADER ========== */
+.top-bar { background:var(--fg); color:#fff; padding:4px 24px; font-size:11px; display:flex; align-items:center; justify-content:space-between; letter-spacing:.04em; }
+.top-bar a { color:rgba(255,255,255,.6); text-decoration:none; transition:color .2s; }
+.top-bar a:hover { color:#fff; }
+.top-bar .dot { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:4px; }
+.top-bar .dot.green { background:#5a8; }
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+.header-left { display:flex; align-items:center; gap:16px; }
+.header-logo { font-size:24px; font-weight:700; letter-spacing:.08em; color:var(--fg); text-decoration:none; }
+.header-logo span { color:var(--accent-deep); }
+.header-divider { width:1px; height:28px; background:var(--border); }
+.header-breadcrumb { font-size:13px; color:var(--muted); letter-spacing:.03em; }
+.header-right { display:flex; align-items:center; gap:12px; }
+.header-link { font-size:12px; color:var(--accent-deep); text-decoration:none; padding:6px 14px; border:1px solid var(--border); border-radius:4px; transition:all .2s; letter-spacing:.04em; }
+.header-link:hover { background:rgba(196,166,130,.08); border-color:var(--accent); }
+
+/* ========== LAYOUT ========== */
+.layout { display:flex; flex:1; }
+.sidebar { width:210px; background:var(--surface); border-right:1px solid var(--border); padding:12px 0; flex-shrink:0; }
+.sidebar-group { padding:8px 24px 4px; font-size:10px; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+.sidebar a { display:flex; align-items:center; gap:8px; padding:11px 24px; font-size:13px; color:var(--muted); text-decoration:none; letter-spacing:.04em; transition:all .2s; }
+.sidebar a:hover, .sidebar a.active { color:var(--accent-deep); background:rgba(196,166,130,.08); }
+.sidebar a .ico { font-size:15px; width:20px; text-align:center; }
+.main { flex:1; padding:24px 32px 48px; overflow-y:auto; max-height:calc(100vh - 104px); }
+.section { display:none; }
+.section.active { display:block; animation:fadeIn .3s; }
+.section h2 { font-size:22px; font-weight:700; margin-bottom:8px; letter-spacing:.03em; }
+.section .section-desc { font-size:12px; color:var(--muted); margin-bottom:24px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin-bottom:16px; }
+.card h3 { font-size:15px; font-weight:600; margin-bottom:12px; color:var(--accent-deep); display:flex; align-items:center; gap:8px; }
+.card h3 .badge { font-size:10px; background:var(--accent); color:#fff; padding:2px 8px; border-radius:10px; font-weight:400; }
+.form-group { margin-bottom:14px; }
+.form-group label { display:block; font-size:12px; color:var(--muted); margin-bottom:5px; letter-spacing:.05em; font-weight:500; }
+.form-group input, .form-group textarea, .form-group select {
+  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:6px;
+  font-size:13px; font-family:inherit; background:var(--bg); transition:border .2s,box-shadow .2s;
+}
+.form-group input:focus, .form-group textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(196,166,130,.12); }
+.form-group textarea { min-height:80px; resize:vertical; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.form-inline { display:flex; gap:8px; align-items:end; }
+.form-inline .form-group { flex:1; margin-bottom:0; }
+.btn { padding:10px 20px; border:none; border-radius:6px; font-size:13px; cursor:pointer; letter-spacing:.04em; transition:all .2s; font-weight:500; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:hover { background:var(--accent-deep); }
+.btn-outline { background:transparent; color:var(--accent-deep); border:1px solid var(--accent); }
+.btn-outline:hover { background:rgba(196,166,130,.08); }
+.btn-danger { background:var(--danger); color:#fff; }
+.btn-danger:hover { opacity:.85; }
+.btn-sm { padding:5px 12px; font-size:11px; }
+.btn-group { display:flex; gap:8px; margin-top:16px; }
+.tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+.tag-item { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; background:rgba(196,166,130,.08); border:1px solid rgba(196,166,130,.15); border-radius:3px; font-size:11px; }
+.tag-item button { background:none; border:none; color:var(--danger); cursor:pointer; font-size:14px; padding:0 2px; }
+
+/* ========== IMAGES ========== */
+.image-upload-area { display:flex; gap:12px; align-items:end; }
+.image-upload-area .form-group { flex:1; margin-bottom:0; }
+.image-preview { width:160px; height:100px; border:1px dashed var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px; overflow:hidden; }
+.image-preview img { width:100%; height:100%; object-fit:cover; }
+.image-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; }
+.image-card { border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.image-card img { width:100%; height:110px; object-fit:cover; display:block; }
+.image-card .info { padding:8px 10px; font-size:11px; color:var(--muted); }
+.image-card .info .url-copy { width:100%; font-size:10px; margin-top:4px; padding:3px; border:1px solid var(--border); border-radius:3px; cursor:pointer; }
+
+/* ========== TOAST ========== */
+.toast { position:fixed; top:16px; right:16px; padding:12px 20px; border-radius:6px; color:#fff; font-size:13px; z-index:999; animation:fadeIn .3s; }
+.toast.success { background:var(--success); }
+.toast.error { background:var(--danger); }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.empty-state { text-align:center; padding:40px; color:var(--muted); font-size:13px; }
+.stat-row { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px; align-items:end; margin-bottom:8px; }
+.stat-row input { padding:7px 8px; font-size:12px; }
+
+/* ========== FOOTER ========== */
+.footer { background:var(--fg); color:rgba(255,255,255,.5); padding:16px 24px; font-size:11px; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; margin-top:auto; }
+.footer a { color:rgba(255,255,255,.6); text-decoration:none; transition:color .2s; }
+.footer a:hover { color:#fff; }
+
+@media (max-width:768px) {
+  .sidebar { display:none; }
+  .main { padding:16px; }
+  .form-row { grid-template-columns:1fr; }
+  .header { padding:12px 16px; }
+  .header-logo { font-size:18px; }
+  .header-link { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== TOP BAR ==================== -->
+<div class="top-bar">
+  <div>
+    <span class="dot green"></span> 系统运行中 · SpringBoot 3.2 · H2
+  </div>
+  <div>
+    <a href="http://localhost:3001" target="_blank" rel="noopener">← 返回前端页面</a>
+  </div>
+</div>
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="header-left">
+    <a href="#" class="header-logo" onclick="location.hash='team';renderSection();return false">🦌 鹿映秦华<span>·</span>管理后台</a>
+    <div class="header-divider"></div>
+    <span class="header-breadcrumb" id="headerBreadcrumb">团队管理</span>
+  </div>
+  <div class="header-right">
+    <span style="font-size:11px;color:var(--muted);">数据 API: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;">/api/site/full</code></span>
+    <button class="btn btn-outline btn-sm" onclick="refreshAll()">🔄 刷新数据</button>
+  </div>
+</div>
+
+<!-- ==================== LAYOUT ==================== -->
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main"></main>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+  <div>&copy; 2025 鹿映秦华实践队 · 内容管理后台</div>
+  <div>
+    <a href="https://github.com" target="_blank">帮助文档</a> &nbsp;|&nbsp;
+    <span id="footerTime"></span>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+const API = '';
+let SITE_DATA = {};
+let ALL_IMAGES = [];
+
+// ==================== NAVIGATION ====================
+const MENUS = [
+  { id:'team', label:'团队管理', ico:'👥' },
+  { id:'culture', label:'文化板块', ico:'🏛️' },
+  { id:'products', label:'农产品', ico:'🍑' },
+  { id:'documentary', label:'实践纪实', ico:'📷' },
+  { id:'closing', label:'页首页尾', ico:'🏁' },
+  { id:'images', label:'图片管理', ico:'🖼️' },
+  { id:'nav', label:'导航设置', ico:'📌' },
+];
+
+function renderSidebar() {
+  const hash = location.hash.replace('#','') || 'team';
+  document.getElementById('sidebar').innerHTML = MENUS.map(m =>
+    `<a href="#${m.id}" class="${m.id===hash?'active':''}"><span class="ico">${m.ico}</span>${m.label}</a>`
+  ).join('');
+  const menu = MENUS.find(m => m.id === hash);
+  document.getElementById('headerBreadcrumb').textContent = menu ? '内容管理 / ' + menu.label : '内容管理';
+}
+
+// ==================== TOAST ====================
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+// ==================== API HELPERS ====================
+async function api(path, method='GET', body=null) {
+  const opts = { method, headers:{ 'Content-Type':'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  const json = await res.json();
+  if (json.code !== 200) throw new Error(json.message || '请求失败');
+  return json.data;
+}
+
+async function uploadImage(file, group) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('group', group || 'general');
+  const res = await fetch(API + '/api/images/upload', { method:'POST', body:fd });
+  const json = await res.json();
+  if (json.code !== 200) throw new Error(json.message || '上传失败');
+  return json.data;
+}
+
+// ==================== IMAGE PICKER HELPER ====================
+// 生成图片选择器 HTML（输入框 + 上传按钮 + 预览 + 快捷选择）
+function imagePicker(id, currentUrl, group) {
+  const preview = currentUrl ? `<img src="${currentUrl.startsWith('http')?currentUrl:(API+currentUrl)}" onerror="this.parentElement.innerHTML='<span>? 预览</span>'">` : '<span>📷 预览</span>';
+  const imgList = (ALL_IMAGES || []).filter(img => !group || img.group === group || img.group === 'general');
+  return `
+    <div class="image-upload-area">
+      <div class="form-group"><label>${id.includes('hero') ? '封面大图 URL' : '图片URL'}</label>
+        <input id="${id}" value="${esc(currentUrl||'')}" placeholder="留空显示占位，或粘贴 /uploads/xxx.jpg" style="font-family:monospace;">
+      </div>
+      <div class="image-preview" id="${id}-preview">${preview}</div>
+      <div class="form-group" style="min-width:120px;"><label>上传新图</label>
+        <input type="file" id="${id}-file" accept="image/*" style="padding:7px;font-size:11px;" onchange="uploadAndSet('${id}','${group||'general'}')">
+      </div>
+    </div>
+    ${imgList.length > 0 ? `
+    <div style="margin-top:8px;">
+      <span style="font-size:10px;color:var(--muted);">快捷选择已上传图片：</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">${imgList.slice(0,8).map(img => `
+        <img src="${img.url}" onclick="setImageUrl('${id}','${esc(img.url)}')" title="${esc(img.originalName||'')}" style="width:50px;height:36px;object-fit:cover;border-radius:3px;cursor:pointer;border:2px solid transparent;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'" loading="lazy">
+      `).join('')}</div>
+    </div>` : ''}
+  `;
+}
+
+async function uploadAndSet(inputId, group) {
+  const fileInput = document.getElementById(inputId + '-file');
+  const file = fileInput.files[0];
+  if (!file) return;
+  try {
+    const result = await uploadImage(file, group);
+    document.getElementById(inputId).value = result.url;
+    updateImagePreview(inputId, result.url);
+    toast('上传成功！');
+    // 刷新图片列表缓存
+    try { ALL_IMAGES = await api('/api/images'); } catch(e) {}
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function setImageUrl(id, url) {
+  document.getElementById(id).value = url;
+  updateImagePreview(id, url);
+}
+
+function updateImagePreview(id, url) {
+  const preview = document.getElementById(id + '-preview');
+  if (preview) {
+    preview.innerHTML = url
+      ? `<img src="${url.startsWith('http')?url:(API+url)}" onerror="this.parentElement.innerHTML='<span>? 预览</span>'">`
+      : '<span>📷 预览</span>';
+  }
+}
+
+// ==================== RENDER SECTIONS ====================
+async function refreshAll() {
+  try {
+    SITE_DATA = await api('/api/site/full');
+    try { ALL_IMAGES = await api('/api/images'); } catch(e) { ALL_IMAGES = []; }
+    renderSection();
+    toast('数据已刷新');
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+function renderSection() {
+  const hash = location.hash.replace('#','') || 'team';
+  renderSidebar();
+  switch(hash) {
+    case 'team': renderTeam(); break;
+    case 'culture': renderCulture(); break;
+    case 'products': renderProducts(); break;
+    case 'documentary': renderDocumentary(); break;
+    case 'closing': renderClosing(); break;
+    case 'images': renderImages(); break;
+    case 'nav': renderNav(); break;
+  }
+}
+
+// ====== TEAM ======
+function renderTeam() {
+  const info = SITE_DATA.teamInfo || {};
+  const stats = SITE_DATA.teamStats || [];
+  const achievements = SITE_DATA.teamAchievements || [];
+
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>👥 团队管理</h2>
+      <p class="section-desc">编辑团队介绍、核心数据、成果展示及图片</p>
+
+    <!-- 团队基本信息 -->
+    <div class="card">
+      <h3>📝 团队基本信息</h3>
+      <div class="form-row">
+        <div class="form-group"><label>小标签 (eyebrow)</label><input id="tf-eyebrow" value="${esc(info.eyebrow||'')}"></div>
+        <div class="form-group"><label>标题</label><input id="tf-title" value="${esc(info.title||'')}"></div>
+      </div>
+      <div class="form-group"><label>副标题 / Slogan</label><input id="tf-subtitle" value="${esc(info.subtitle||'')}"></div>
+      <div class="form-group"><label>团队描述</label><textarea id="tf-desc">${esc(info.description||'')}</textarea></div>
+      <div class="form-group"><label>格言</label><textarea id="tf-motto">${esc(info.motto||'')}</textarea></div>
+    </div>
+
+    <!-- 团队 LOGO -->
+    <div class="card">
+      <h3>🔵 团队 LOGO <span class="badge">圆形</span></h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">团队圆形 LOGO（建议透明背景 PNG，240×240）— 显示在团队板块</p>
+      ${imagePicker('team-logo', info.teamLogoUrl || '', 'team')}
+    </div>
+
+    <!-- 团队封面图 -->
+    <div class="card">
+      <h3>🖼️ 团队封面大图 <span class="badge">Hero</span></h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">首屏 Hero 区域的全屏背景大图（建议 1920×1080 以上）</p>
+      ${imagePicker('team-hero-img', info.imageUrl || '', 'team')}
+    </div>
+
+    <!-- 团队照片 4 张 -->
+    <div class="card">
+      <h3>📸 团队照片（右侧错落网格）</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">4 张团队纪实照片，用于团队板块右侧的不对称错落布局</p>
+      ${(() => {
+        const photos = [
+          { id: 'team-photo1', url: info.photo1Url, label: info.photo1Label, defaultLabel: '团队合影 · 秦安田间', hint: '大图 (col-span-4 row-span-3) — 主图' },
+          { id: 'team-photo2', url: info.photo2Url, label: info.photo2Label, defaultLabel: '田间调研', hint: '右上小图 (col-span-2 row-span-2)' },
+          { id: 'team-photo3', url: info.photo3Url, label: info.photo3Label, defaultLabel: '村落走访', hint: '左下 (col-span-3 row-span-2)' },
+          { id: 'team-photo4', url: info.photo4Url, label: info.photo4Label, defaultLabel: '小组研讨', hint: '右下 (col-span-3 row-span-2)' },
+        ];
+        return photos.map(p => `
+          <div style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px;">
+            <p style="font-size:11px;color:var(--accent-deep);margin-bottom:6px;font-weight:500;">📷 ${p.hint}</p>
+            <div class="form-group" style="margin-bottom:8px;"><label>照片名称</label>
+              <input id="${p.id}-label" value="${esc(p.label||p.defaultLabel)}" placeholder="${esc(p.defaultLabel)}">
+            </div>
+            ${imagePicker(p.id, p.url, 'team')}
+          </div>
+        `).join('');
+      })()}
+    </div>
+
+    <!-- 青年愿景 -->
+    <div class="card">
+      <h3>✨ 青年愿景</h3>
+      <div class="form-group"><label>愿景标题（支持 HTML）</label><textarea id="tf-mtitle">${esc(info.missionTitle||'')}</textarea></div>
+      <div class="form-group"><label>愿景描述</label><textarea id="tf-mdesc">${esc(info.missionDesc||'')}</textarea></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveTeamInfo()" style="margin-bottom:12px;">💾 保存团队信息（以上全部）</button>
+
+    <!-- 核心数据 -->
+    <div class="card">
+      <h3>📊 核心数据 <span class="badge">滚动计数</span></h3>
+      ${stats.map((s,i) => `
+        <div class="stat-row">
+          <input id="stat-label-${i}" value="${esc(s.label||'')}" placeholder="标签">
+          <input id="stat-value-${i}" value="${esc(s.value||'')}" placeholder="数值">
+          <input id="stat-suffix-${i}" value="${esc(s.suffix||'')}" placeholder="后缀">
+          <div class="btn-group" style="margin-top:0;">
+            <button class="btn btn-primary btn-sm" onclick="saveStat(${s.id},${i})">保存</button>
+            <label style="font-size:10px;cursor:pointer;display:flex;align-items:center;gap:2px;"><input type="checkbox" id="stat-istext-${i}" ${s.isText?'checked':''}> 纯文本</label>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- 成果条 -->
+    <div class="card">
+      <h3>🏆 成果展示</h3>
+      ${achievements.map((a,i) => `
+        <div class="stat-row">
+          <input id="ach-label-${i}" value="${esc(a.label||'')}" placeholder="标签">
+          <input id="ach-value-${i}" value="${esc(a.value||'')}" placeholder="数值">
+          <span></span>
+          <button class="btn btn-primary btn-sm" onclick="saveAchievement(${a.id},${i})">保存</button>
+        </div>
+      `).join('')}
+    </div>
+    </div>`;
+}
+
+async function saveTeamInfo() {
+  const body = {
+    eyebrow: document.getElementById('tf-eyebrow')?.value || '',
+    title: document.getElementById('tf-title')?.value || '',
+    subtitle: document.getElementById('tf-subtitle')?.value || '',
+    description: document.getElementById('tf-desc')?.value || '',
+    missionTitle: document.getElementById('tf-mtitle')?.value || '',
+    missionDesc: document.getElementById('tf-mdesc')?.value || '',
+    motto: document.getElementById('tf-motto')?.value || '',
+    imageUrl: document.getElementById('team-hero-img')?.value || null,
+    teamLogoUrl: document.getElementById('team-logo')?.value || null,
+    photo1Url: document.getElementById('team-photo1')?.value || null,
+    photo1Label: document.getElementById('team-photo1-label')?.value || null,
+    photo2Url: document.getElementById('team-photo2')?.value || null,
+    photo2Label: document.getElementById('team-photo2-label')?.value || null,
+    photo3Url: document.getElementById('team-photo3')?.value || null,
+    photo3Label: document.getElementById('team-photo3-label')?.value || null,
+    photo4Url: document.getElementById('team-photo4')?.value || null,
+    photo4Label: document.getElementById('team-photo4-label')?.value || null,
+  };
+  try { await api('/api/team/info', 'PUT', body); toast('团队信息已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function saveStat(id, i) {
+  const body = {
+    label: document.getElementById(`stat-label-${i}`).value,
+    value: document.getElementById(`stat-value-${i}`).value,
+    suffix: document.getElementById(`stat-suffix-${i}`).value,
+    isText: document.getElementById(`stat-istext-${i}`)?.checked || false,
+  };
+  try { await api(`/api/team/stats/${id}`, 'PUT', body); toast('数据已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function saveAchievement(id, i) {
+  const body = {
+    label: document.getElementById(`ach-label-${i}`).value,
+    value: document.getElementById(`ach-value-${i}`).value,
+  };
+  try { await api(`/api/team/achievements/${id}`, 'PUT', body); toast('成果已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== CULTURE ======
+function renderCulture() {
+  const items = SITE_DATA.cultureItems || [];
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>🏛️ 文化板块管理</h2>
+      <p class="section-desc">管理秦安 · 天水文化展示的三个板块内容</p>
+    ${items.map((item,i) => `
+      <div class="card">
+        <h3>文化项 #${i+1}: ${esc(item.title||'')}</h3>
+        <div class="form-row">
+          <div class="form-group"><label>小标签</label><input id="ct-${i}-tag" value="${esc(item.subtitleTag||'')}"></div>
+          <div class="form-group"><label>标题</label><input id="ct-${i}-title" value="${esc(item.title||'')}"></div>
+        </div>
+        <div class="form-group"><label>描述</label><textarea id="ct-${i}-desc">${esc(item.description||'')}</textarea></div>
+        ${imagePicker(`ct-${i}-img`, item.imageUrl, 'culture')}
+        <div class="form-group"><label>图片占位文字（无图片时显示）</label><input id="ct-${i}-ph" value="${esc(item.imagePlaceholder||'')}"></div>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0;">标签：</p>
+        <div class="tag-list">${(item.tags||[]).map(t => `
+          <span class="tag-item">${esc(t.name)}<small style="color:var(--muted)">(${esc(t.note||'')})</small></span>
+        `).join('')}</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">标签修改：编辑下方 JSON 后保存</p>
+        <textarea id="ct-${i}-tags" style="width:100%;min-height:120px;font-family:monospace;font-size:11px;padding:8px;border:1px solid var(--border);border-radius:4px;">${esc(JSON.stringify((item.tags||[]).map(t=>({name:t.name,note:t.note,sortOrder:t.sortOrder})),null,2))}</textarea>
+        <div class="btn-group"><button class="btn btn-primary" onclick="saveCultureItem(${item.id},${i})">保存此项</button></div>
+      </div>
+    `).join('')}
+    </div>`;
+}
+
+async function saveCultureItem(id, i) {
+  let tags = [];
+  try { tags = JSON.parse(document.getElementById(`ct-${i}-tags`).value); } catch(e) { toast('标签JSON格式错误', 'error'); return; }
+  const body = {
+    subtitleTag: document.getElementById(`ct-${i}-tag`).value,
+    title: document.getElementById(`ct-${i}-title`).value,
+    description: document.getElementById(`ct-${i}-desc`).value,
+    imageUrl: document.getElementById(`ct-${i}-img`).value || null,
+    imagePlaceholder: document.getElementById(`ct-${i}-ph`).value,
+    tags,
+  };
+  try { await api(`/api/culture/items/${id}`, 'PUT', body); toast('文化项已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== PRODUCTS ======
+function renderProducts() {
+  const prods = SITE_DATA.products || [];
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>🍑 农产品管理</h2>
+      <p class="section-desc">管理秦安特色农产品（水蜜桃、花椒）的展示内容</p>
+    ${prods.map((p,i) => `
+      <div class="card">
+        <h3>${esc(p.subLabel||'')} — ${esc(p.name||'')}</h3>
+        <div class="form-row">
+          <div class="form-group"><label>小标签</label><input id="pd-${i}-sub" value="${esc(p.subLabel||'')}"></div>
+          <div class="form-group"><label>大字前缀</label><input id="pd-${i}-prefix" value="${esc(p.namePrefix||'')}"></div>
+        </div>
+        <div class="form-group"><label>产品名</label><input id="pd-${i}-name" value="${esc(p.name||'')}"></div>
+        <div class="form-group"><label>描述</label><textarea id="pd-${i}-desc">${esc(p.description||'')}</textarea></div>
+        ${imagePicker(`pd-${i}-img`, p.imageUrl, 'products')}
+        <div class="form-group"><label>图片占位文字</label><input id="pd-${i}-ph" value="${esc(p.imagePlaceholder||'')}"></div>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0;">特色标签 (JSON)</p>
+        <textarea id="pd-${i}-tags" style="width:100%;min-height:80px;font-family:monospace;font-size:11px;padding:8px;border:1px solid var(--border);border-radius:4px;">${esc(JSON.stringify((p.tags||[]).map(t=>({name:t.name,sortOrder:t.sortOrder})),null,2))}</textarea>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0;">关键数据 (JSON)</p>
+        <textarea id="pd-${i}-stats" style="width:100%;min-height:120px;font-family:monospace;font-size:11px;padding:8px;border:1px solid var(--border);border-radius:4px;">${esc(JSON.stringify((p.stats||[]).map(s=>({label:s.label,value:s.value,suffix:s.suffix,isText:s.isText,sortOrder:s.sortOrder})),null,2))}</textarea>
+        <div class="btn-group"><button class="btn btn-primary" onclick="saveProduct(${p.id},${i})">保存产品</button></div>
+      </div>
+    `).join('')}
+    </div>`;
+}
+
+async function saveProduct(id, i) {
+  let tags=[], stats=[];
+  try { tags=JSON.parse(document.getElementById(`pd-${i}-tags`).value); } catch(e) { toast('标签JSON格式错误','error'); return; }
+  try { stats=JSON.parse(document.getElementById(`pd-${i}-stats`).value); } catch(e) { toast('数据JSON格式错误','error'); return; }
+  const body = {
+    subLabel: document.getElementById(`pd-${i}-sub`).value,
+    namePrefix: document.getElementById(`pd-${i}-prefix`).value,
+    name: document.getElementById(`pd-${i}-name`).value,
+    description: document.getElementById(`pd-${i}-desc`).value,
+    imageUrl: document.getElementById(`pd-${i}-img`).value || null,
+    imagePlaceholder: document.getElementById(`pd-${i}-ph`).value,
+    tags, stats,
+  };
+  try { await api(`/api/products/${id}`, 'PUT', body); toast('产品已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== DOCUMENTARY ======
+function renderDocumentary() {
+  const items = SITE_DATA.documentaryItems || [];
+  const stories = SITE_DATA.stories || [];
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>📷 实践纪实管理</h2>
+      <p class="section-desc">管理实践纪实照片（马赛克网格）和纪实故事</p>
+    <h3 style="margin:16px 0 12px;color:var(--accent-deep);">纪实照片 (${items.length}项)</h3>
+    ${items.map((d,i) => `
+      <div class="card">
+        <h3>#${i+1} ${esc(d.icon||'')} ${esc(d.label||'')}</h3>
+        <div class="stat-row">
+          <input id="dc-${i}-label" value="${esc(d.label||'')}" placeholder="标签">
+          <input id="dc-${i}-time" value="${esc(d.timeLabel||'')}" placeholder="时间">
+          <input id="dc-${i}-note" value="${esc(d.note||'')}" placeholder="备注">
+        </div>
+        <div class="stat-row" style="grid-template-columns:1fr 1fr 1fr 1fr auto;">
+          ${imagePicker(`dc-${i}-img`, d.imageUrl, 'documentary').replace(/图片URL/g,'图片URL').replace(/上传新图/g,'')}
+          <input id="dc-${i}-cols" value="${d.colsSpan||1}" type="number" min="1" max="2" placeholder="列">
+          <input id="dc-${i}-rows" value="${d.rowsSpan||1}" type="number" min="1" max="2" placeholder="行">
+          <input id="dc-${i}-icon" value="${esc(d.icon||'')}" placeholder="emoji">
+          <button class="btn btn-primary btn-sm" onclick="saveDocItem(${d.id},${i})">保存</button>
+        </div>
+        <div style="margin-top:8px;">
+          <div class="form-group"><label>背景渐变CSS</label><input id="dc-${i}-bg" value="${esc(d.bgGradient||'')}"></div>
+          <div class="form-group"><label>图片URL（优先于渐变背景）</label><input id="dc-${i}-img" value="${esc(d.imageUrl||'')}" placeholder="/uploads/xxx.jpg"></div>
+        </div>
+      </div>
+    `).join('')}
+    <h3 style="margin:24px 0 12px;color:var(--accent-deep);">纪实故事</h3>
+    ${stories.map((s,i) => `
+      <div class="card">
+        <div class="form-group"><label>标题</label><input id="st-${i}-title" value="${esc(s.title||'')}"></div>
+        <div class="form-group"><label>描述</label><textarea id="st-${i}-desc">${esc(s.description||'')}</textarea></div>
+        <button class="btn btn-primary" onclick="saveStory(${s.id},${i})">保存故事</button>
+      </div>
+    `).join('')}
+    </div>`;
+}
+
+async function saveDocItem(id, i) {
+  const body = {
+    label: document.getElementById(`dc-${i}-label`)?.value || '',
+    timeLabel: document.getElementById(`dc-${i}-time`)?.value || '',
+    note: document.getElementById(`dc-${i}-note`)?.value || '',
+    imageUrl: document.getElementById(`dc-${i}-img`)?.value || null,
+    colsSpan: parseInt(document.getElementById(`dc-${i}-cols`)?.value)||1,
+    rowsSpan: parseInt(document.getElementById(`dc-${i}-rows`)?.value)||1,
+    icon: document.getElementById(`dc-${i}-icon`)?.value || '',
+    bgGradient: document.getElementById(`dc-${i}-bg`)?.value || '',
+  };
+  try { await api(`/api/documentary/items/${id}`, 'PUT', body); toast('纪实项已保存'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function saveStory(id, i) {
+  const body = {
+    title: document.getElementById(`st-${i}-title`)?.value || '',
+    description: document.getElementById(`st-${i}-desc`)?.value || '',
+  };
+  try { await api(`/api/stories/${id}`, 'PUT', body); toast('故事已保存'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== CLOSING / HEADER & FOOTER ======
+function renderClosing() {
+  const closingImage = SITE_DATA.closingImage || '';
+  const closingBrand = SITE_DATA.closingBrand || '鹿映秦华';
+  const closingSubtitle = SITE_DATA.closingSubtitle || '以青年视角重新发现乡土价值';
+
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>🏁 页首页尾管理</h2>
+      <p class="section-desc">管理页面收尾闭环模块（Footer）的背景图和文案</p>
+
+    <!-- Footer / Closing 背景图 -->
+    <div class="card">
+      <h3>🖼️ 收尾区域背景大图 <span class="badge">Closing</span></h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">页面底部"鹿映秦华"收尾闭环区域的背景图（建议 1920×800 以上）</p>
+      ${imagePicker('closing-bg-img', closingImage, 'closing')}
+    </div>
+
+    <!-- Footer 文案 -->
+    <div class="card">
+      <h3>📝 收尾区域文案</h3>
+      <div class="form-group"><label>品牌名</label><input id="closing-brand" value="${esc(closingBrand)}"></div>
+      <div class="form-group"><label>副标题</label><input id="closing-subtitle" value="${esc(closingSubtitle)}"></div>
+      <button class="btn btn-primary" onclick="saveClosing()">💾 保存页尾设置</button>
+    </div>
+    </div>`;
+}
+
+async function saveClosing() {
+  const body = {
+    closingImage: document.getElementById('closing-bg-img')?.value || null,
+    closingBrand: document.getElementById('closing-brand')?.value || '鹿映秦华',
+    closingSubtitle: document.getElementById('closing-subtitle')?.value || '',
+  };
+  try { await api('/api/config', 'PUT', body); toast('页尾设置已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== IMAGES ======
+async function renderImages() {
+  let images = [];
+  try { images = await api('/api/images'); ALL_IMAGES = images; } catch(e) { images = []; }
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>🖼️ 图片管理</h2>
+      <p class="section-desc">上传、浏览和管理所有图片资源</p>
+    <div class="card">
+      <h3>上传新图片</h3>
+      <div class="form-row">
+        <div class="form-group"><label>选择图片 (jpg/png/webp/gif, ≤10MB)</label><input type="file" id="fileInput" accept="image/*"></div>
+        <div class="form-group"><label>分组标签</label>
+          <select id="fileGroup">
+            <option value="general">通用</option>
+            <option value="team">团队</option>
+            <option value="culture">文化</option>
+            <option value="products">产品</option>
+            <option value="documentary">纪实</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="doUpload()">📤 上传图片</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;">上传后复制 URL，填入对应模块的图片URL字段即可</p>
+    </div>
+    <div class="card">
+      <h3>已上传图片 (${images.length})</h3>
+      ${images.length === 0 ? '<div class="empty-state">暂无图片</div>' : `
+        <div class="image-grid">
+          ${images.map(img => `
+            <div class="image-card">
+              <img src="${img.url}" alt="${esc(img.originalName||'')}" loading="lazy" onerror="this.style.background='#f0ece6';this.style.height='110px';">
+              <div class="info">
+                <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(img.originalName||'')}">${esc(img.originalName||'')}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
+                  <span>${formatSize(img.size)} · ${esc(img.group||'')}</span>
+                  <button class="btn btn-danger btn-sm" onclick="deleteImage(${img.id})">删除</button>
+                </div>
+                <input value="${img.url}" readonly class="url-copy" onclick="this.select();navigator.clipboard.writeText(this.value);toast('已复制URL')" title="点击复制URL">
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `}
+    </div>
+    </div>`;
+}
+
+async function doUpload() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) { toast('请选择文件', 'error'); return; }
+  const group = document.getElementById('fileGroup').value;
+  try {
+    const result = await uploadImage(file, group);
+    toast(`上传成功！URL: ${result.url}`);
+    await renderImages();
+  } catch(e) { toast(e.message, 'error'); }
+}
+async function deleteImage(id) {
+  if (!confirm('确认删除此图片？')) return;
+  try { await api(`/api/images/${id}`, 'DELETE'); toast('已删除'); await renderImages(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== NAV ======
+function renderNav() {
+  const items = SITE_DATA.navItems || [];
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>📌 导航设置</h2>
+      <p class="section-desc">管理页面顶部导航栏的菜单项</p>
+    <div class="card">
+      ${items.map((n,i) => `
+        <div class="stat-row">
+          <input id="nav-${i}-id" value="${esc(n.navId||'')}" placeholder="标识">
+          <input id="nav-${i}-label" value="${esc(n.label||'')}" placeholder="显示文字">
+          <input id="nav-${i}-href" value="${esc(n.href||'')}" placeholder="链接">
+          <button class="btn btn-primary btn-sm" onclick="saveNav(${n.id},${i})">保存</button>
+        </div>
+      `).join('')}
+    </div>
+    </div>`;
+}
+
+async function saveNav(id, i) {
+  const body = {
+    navId: document.getElementById(`nav-${i}-id`).value,
+    label: document.getElementById(`nav-${i}-label`).value,
+    href: document.getElementById(`nav-${i}-href`).value,
+  };
+  try { await api(`/api/nav/items/${id}`, 'PUT', body); toast('导航已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ==================== UTILS ====================
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\\/g,'\\\\');
+}
+function formatSize(bytes) { if (!bytes) return '0 B'; if (bytes<1024) return bytes+' B'; if (bytes<1048576) return (bytes/1024).toFixed(1)+' KB'; return (bytes/1048576).toFixed(1)+' MB'; }
+
+// ==================== ROUTING ====================
+window.addEventListener('hashchange', () => {
+  if (Object.keys(SITE_DATA).length > 0) renderSection();
+});
+
+// ==================== INIT ====================
+(async function init() {
+  document.getElementById('footerTime').textContent = '已运行 ' + new Date().toLocaleString('zh-CN');
+  try {
+    SITE_DATA = await api('/api/site/full');
+    try { ALL_IMAGES = await api('/api/images'); } catch(e) { ALL_IMAGES = []; }
+  } catch(e) {
+    console.warn('无法加载全站数据:', e.message);
+  }
+  renderSection();
+})();
+</script>
+</body>
+</html>

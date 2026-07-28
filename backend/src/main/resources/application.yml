@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+
+  # ====== 编码 & 文件上传 ======
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  # 前端构建产物作为额外静态资源（Vue build 输出的 dist/）
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - classpath:/public/
+        - classpath:/resources/
+        - classpath:/META-INF/resources/
+        - file:../dist/
+  datasource:
+    url: jdbc:h2:file:./data/luyingqinhua;AUTO_SERVER=TRUE;MODE=MySQL;NON_KEYWORDS=VALUE,GROUP,PATH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: never
+
+# ====== 自定义配置 ======
+app:
+  upload:
+    path: ./uploads
+    allowed-extensions: jpg,jpeg,png,webp,gif
+  site:
+    name: 鹿映秦华
+    # base-url 仅用于上传后返回的完整 URL（留空则返回相对路径）
+    base-url:
+
+---
+# ====== 生产环境 MySQL ======
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/luyingqinhua?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ${MYSQL_PASSWORD:}
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
