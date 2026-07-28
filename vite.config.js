@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
+  
   server: {
     allowedHosts: true,
     host: '0.0.0.0',
@@ -19,6 +20,7 @@ export default defineConfig({
       },
     },
   },
-  // 生产构建资源使用相对路径
   base: './',
+  // 生产构建资源使用相对路径
+  
 })
