@@ -424,6 +424,20 @@
   .display-md {
     font-size: 1.5rem;
   }
+  /* Hero carousel mobile buttons */
+  .hero-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+  /* Section padding compact */
+  .section-container {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  /* Message wall mobile height */
+  .msg-wall-mobile {
+    height: 360px;
+  }
 }
 
 /* ====== 团队圆形 LOGO ====== */
@@ -446,6 +460,117 @@
 }
 @media (min-width: 1024px) {
   .team-logo-wrap { width: 200px; height: 200px; }
+}
+
+/* ====== 页脚 2x2 媒体图标网格 ====== */
+.footer-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 250px);
+  grid-template-rows: repeat(2, 250px);
+  gap: 20px;
+}
+.footer-icon-cell {
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.footer-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.9;
+  padding: 12px;
+  transition: opacity 0.3s ease;
+}
+.footer-icon-cell:hover .footer-icon-img {
+  opacity: 1;
+}
+
+/* 兼容旧 class 名 */
+.social-icon-svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ====== 留言墙滚动动画 ====== */
+@keyframes messageScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-33.333%); }
+}
+.message-wall-scroll {
+  animation: messageScroll 60s linear infinite;
+}
+.message-wall-scroll.paused {
+  animation-play-state: paused;
+}
+
+/* ====== 留言墙头像 ====== */
+.msg-avatar-img-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.msg-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.msg-avatar-text {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ====== 留言卡片hover ====== */
+.message-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.message-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border-color: var(--color-accent);
+}
+
+/* ====== Hero 轮播文字平滑过渡 ====== */
+.hero-slide-text {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* ====== Hero 轮播按钮移动端 ====== */
+@media (max-width: 640px) {
+  .footer-icon-grid {
+    grid-template-columns: repeat(2, 160px);
+    grid-template-rows: repeat(2, 160px);
+    gap: 12px;
+  }
+  .footer-icon-cell {
+    width: 160px;
+    height: 160px;
+  }
+  .footer-icon-img {
+    padding: 8px;
+  }
 }
 
 /* ====== reduced-motion 可访问性 ====== */

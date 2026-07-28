@@ -57,6 +57,7 @@ public class DocumentaryService {
         Story story = getStoryById(id);
         if (updated.getTitle() != null) story.setTitle(updated.getTitle());
         if (updated.getDescription() != null) story.setDescription(updated.getDescription());
+        if (updated.getImageUrl() != null) story.setImageUrl(updated.getImageUrl());
         return storyRepo.save(story);
     }
 }

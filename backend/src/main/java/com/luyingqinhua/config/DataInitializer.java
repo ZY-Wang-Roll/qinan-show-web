@@ -28,6 +28,9 @@ public class DataInitializer implements CommandLineRunner {
         seedProducts();
         seedDocumentary();
         seedStories();
+        seedMessages();
+        seedHeroSlides();
+        seedFooterIcons();
 
         em.flush();
     }
@@ -38,6 +41,7 @@ public class DataInitializer implements CommandLineRunner {
             {"culture", "秦安文化", "#culture"},
             {"products", "农产品", "#products"},
             {"documentary", "实践纪实", "#documentary"},
+            {"message", "留言互动", "#message"},
             {"closing", "关于", "#closing"},
         };
         for (int i = 0; i < items.length; i++) {
@@ -59,6 +63,7 @@ public class DataInitializer implements CommandLineRunner {
         info.setMissionTitle("以镜头为笔，<br />以土地为卷，<br />书写乡村的当代叙事。");
         info.setMissionDesc("我们相信，乡村振兴不只是基建与产业，更是文化与记忆的延续。鹿映秦华以青年视角重新发现乡土价值，让每寸土地的故事被看见。");
         info.setMotto("\" 用镜头记录变迁，用脚步丈量土地，用青春回应时代。\"");
+        info.setMissionImageUrl("");
         em.persist(info);
     }
 
@@ -250,6 +255,66 @@ public class DataInitializer implements CommandLineRunner {
             s.setDescription(stories[i][1]);
             s.setSortOrder(i + 1);
             em.persist(s);
+        }
+    }
+
+    private void seedMessages() {
+        String[][] msgs = {
+            {"晓风残月", "sunwarn@qq.com", "乡村振兴需要更多年轻人的参与和关注，鹿映秦华加油！希望秦安的蜜桃能走向全国。"},
+            {"田野守望者", "", "我是秦安本地人，看到你们年轻人为家乡宣传，真的很感动。欢迎大家来秦安做客！"},
+            {"城市旅人", "", "去过一次秦安，被那里的淳朴和美景深深吸引。期待你们的实践成果展示。"},
+            {"文化爱好者", "", "大地湾遗址和麦积山石窟都是华夏文明的瑰宝，感谢你们让更多人了解这里。"},
+            {"青年志愿者", "", "同为大学生，你们的实践精神值得学习。把论文写在祖国大地上，说得太好了。"},
+            {"陇上人家", "", "黄土高原的儿女永远热爱这片土地。鹿映秦华，名字真好听，寓意深远。"},
+            {"摄影小兵", "", "纪录片的视角很棒！期待看到更多关于秦安风土人情的纪实影像。"},
+            {"热心网友", "", "网站做得很有格调，简约大气。祝愿秦安越来越好，加油！"},
+            {"麦积烟雨", "", "天水麦积山的石窟艺术让人叹为观止，秦安小曲婉转悠扬，文化底蕴太深厚了。"},
+            {"蜜桃甜甜", "", "秦安水蜜桃真的太好吃了！汁多味甜，每年夏天都盼着这一口。"},
+            {"行走陇上", "", "从黄土高原到葫芦河畔，秦安的每一寸土地都充满了故事。致敬每一位乡村振兴的奋斗者。"},
+            {"归来少年", "", "毕业后回到家乡秦安工作已经三年了，看到越来越多的人关注这里，特别欣慰。"},
+        };
+        for (String[] m : msgs) {
+            Message msg = new Message();
+            msg.setNickname(m[0]);
+            msg.setEmail(m[1]);
+            msg.setContent(m[2]);
+            msg.setEnabled(true);
+            em.persist(msg);
+        }
+    }
+
+    private void seedHeroSlides() {
+        String[][] slides = {
+            {"", "鹿映秦华", "LUYING QINHUA · 2025", "赴甘肃天水秦安 · 乡村振兴社会实践\n青年力量赋能乡土新生", "1", "true"},
+            {"", "深耕厚土", "深耕厚土 · 田野调研", "走进秦安田间地头，用脚步丈量每一寸土地的温度", "2", "true"},
+            {"", "青春纪实", "青春纪实 · 影像力量", "以镜头记录乡土变迁，让每一帧画面诉说乡村故事", "3", "true"},
+        };
+        for (String[] s : slides) {
+            HeroSlide slide = new HeroSlide();
+            slide.setImageUrl(s[0]);
+            slide.setTitle(s[1]);
+            slide.setSubtitle(s[2]);
+            slide.setDescription(s[3]);
+            slide.setSortOrder(Integer.parseInt(s[4]));
+            slide.setEnabled(Boolean.parseBoolean(s[5]));
+            em.persist(slide);
+        }
+    }
+
+    private void seedFooterIcons() {
+        String[][] icons = {
+            {"小红书", "#", "1", "true"},
+            {"视频号", "#", "2", "true"},
+            {"快手", "#", "3", "true"},
+            {"抖音", "#", "4", "true"},
+        };
+        for (String[] ic : icons) {
+            FooterIcon icon = new FooterIcon();
+            icon.setName(ic[0]);
+            icon.setLink(ic[1]);
+            icon.setSortOrder(Integer.parseInt(ic[2]));
+            icon.setEnabled(Boolean.parseBoolean(ic[3]));
+            em.persist(icon);
         }
     }
 }

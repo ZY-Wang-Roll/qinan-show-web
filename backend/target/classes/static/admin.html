@@ -157,6 +157,9 @@ const MENUS = [
   { id:'products', label:'农产品', ico:'🍑' },
   { id:'documentary', label:'实践纪实', ico:'📷' },
   { id:'closing', label:'页首页尾', ico:'🏁' },
+  { id:'hero-slides', label:'Hero大屏', ico:'🔄' },
+  { id:'footer-icons', label:'页脚图标', ico:'🔗' },
+  { id:'messages', label:'留言管理', ico:'💬' },
   { id:'images', label:'图片管理', ico:'🖼️' },
   { id:'nav', label:'导航设置', ico:'📌' },
 ];
@@ -273,6 +276,9 @@ function renderSection() {
     case 'products': renderProducts(); break;
     case 'documentary': renderDocumentary(); break;
     case 'closing': renderClosing(); break;
+    case 'hero-slides': renderHeroSlides(); break;
+    case 'footer-icons': renderFooterIcons(); break;
+    case 'messages': renderMessages(); break;
     case 'images': renderImages(); break;
     case 'nav': renderNav(); break;
   }
@@ -343,6 +349,7 @@ function renderTeam() {
       <h3>✨ 青年愿景</h3>
       <div class="form-group"><label>愿景标题（支持 HTML）</label><textarea id="tf-mtitle">${esc(info.missionTitle||'')}</textarea></div>
       <div class="form-group"><label>愿景描述</label><textarea id="tf-mdesc">${esc(info.missionDesc||'')}</textarea></div>
+      ${imagePicker('team-mission-img', info.missionImageUrl || '', 'team')}
     </div>
 
     <button class="btn btn-primary" onclick="saveTeamInfo()" style="margin-bottom:12px;">💾 保存团队信息（以上全部）</button>
@@ -397,6 +404,7 @@ async function saveTeamInfo() {
     photo3Label: document.getElementById('team-photo3-label')?.value || null,
     photo4Url: document.getElementById('team-photo4')?.value || null,
     photo4Label: document.getElementById('team-photo4-label')?.value || null,
+    missionImageUrl: document.getElementById('team-mission-img')?.value || null,
   };
   try { await api('/api/team/info', 'PUT', body); toast('团队信息已保存'); await refreshAll(); }
   catch(e) { toast(e.message, 'error'); }
@@ -542,9 +550,11 @@ function renderDocumentary() {
     <h3 style="margin:24px 0 12px;color:var(--accent-deep);">纪实故事</h3>
     ${stories.map((s,i) => `
       <div class="card">
+        <h3>故事 #${i+1}: ${esc(s.title||'')}</h3>
         <div class="form-group"><label>标题</label><input id="st-${i}-title" value="${esc(s.title||'')}"></div>
         <div class="form-group"><label>描述</label><textarea id="st-${i}-desc">${esc(s.description||'')}</textarea></div>
-        <button class="btn btn-primary" onclick="saveStory(${s.id},${i})">保存故事</button>
+        ${imagePicker(`st-${i}-img`, s.imageUrl || '', 'stories')}
+        <button class="btn btn-primary" onclick="saveStory(${s.id},${i})">💾 保存故事</button>
       </div>
     `).join('')}
     </div>`;
@@ -568,6 +578,7 @@ async function saveStory(id, i) {
   const body = {
     title: document.getElementById(`st-${i}-title`)?.value || '',
     description: document.getElementById(`st-${i}-desc`)?.value || '',
+    imageUrl: document.getElementById(`st-${i}-img`)?.value || null,
   };
   try { await api(`/api/stories/${id}`, 'PUT', body); toast('故事已保存'); }
   catch(e) { toast(e.message, 'error'); }
@@ -702,6 +713,202 @@ async function saveNav(id, i) {
     href: document.getElementById(`nav-${i}-href`).value,
   };
   try { await api(`/api/nav/items/${id}`, 'PUT', body); toast('导航已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== HERO SLIDES ======
+function renderHeroSlides() {
+  const slides = SITE_DATA.heroSlides || [];
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>🔄 Hero 轮播管理</h2>
+      <p class="section-desc">管理首页首屏轮播大屏：每张轮播可独立配置标题、副标题、描述文字和图片</p>
+    <button class="btn btn-primary" onclick="createHeroSlide()" style="margin-bottom:16px;">➕ 新增轮播页</button>
+    ${slides.length === 0 ? '<div class="card"><div class="empty-state">暂无轮播页，请点击上方按钮新建</div></div>' :
+      slides.map((s, i) => `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin:0;">轮播项 #${i+1}: ${esc(s.title || '未命名')}</h3>
+          <div style="display:flex;gap:6px;">
+            ${i > 0 ? `<button class="btn btn-outline btn-sm" onclick="moveHeroSlide(${s.id},'up')">⬆</button>` : ''}
+            ${i < slides.length - 1 ? `<button class="btn btn-outline btn-sm" onclick="moveHeroSlide(${s.id},'down')">⬇</button>` : ''}
+            <button class="btn btn-danger btn-sm" onclick="deleteHeroSlide(${s.id})">🗑 删除</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>大标题</label><input id="hs-${i}-title" value="${esc(s.title||'')}" placeholder="鹿映秦华"></div>
+          <div class="form-group"><label>副标题 (eyebrow)</label><input id="hs-${i}-subtitle" value="${esc(s.subtitle||'')}" placeholder="LUYING QINHUA · 2025"></div>
+        </div>
+        <div class="form-group"><label>描述文字（支持 \\n 换行）</label><textarea id="hs-${i}-desc">${esc(s.description||'')}</textarea></div>
+        ${imagePicker(`hs-${i}-img`, s.imageUrl, 'hero')}
+        <div class="form-row">
+          <div class="form-group"><label>排序</label><input id="hs-${i}-order" value="${s.sortOrder||i+1}" type="number"></div>
+          <div class="form-group" style="align-self:end;"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px;">
+            <input type="checkbox" id="hs-${i}-enabled" ${s.enabled !== false ? 'checked' : ''}> 启用此项
+          </label></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveHeroSlide(${s.id},${i})">💾 保存此项</button>
+      </div>
+    `).join('')}
+    </div>`;
+}
+async function createHeroSlide() {
+  try { await api('/api/hero-slides', 'POST', { title:'新轮播页', subtitle:'', description:'', imageUrl:'', sortOrder:99, enabled:true }); toast('已创建'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function saveHeroSlide(id, i) {
+  const body = {
+    title: document.getElementById(`hs-${i}-title`)?.value || '',
+    subtitle: document.getElementById(`hs-${i}-subtitle`)?.value || '',
+    description: document.getElementById(`hs-${i}-desc`)?.value || '',
+    imageUrl: document.getElementById(`hs-${i}-img`)?.value || null,
+    sortOrder: parseInt(document.getElementById(`hs-${i}-order`)?.value) || 1,
+    enabled: document.getElementById(`hs-${i}-enabled`)?.checked,
+  };
+  try { await api(`/api/hero-slides/${id}`, 'PUT', body); toast('Hero轮播已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function deleteHeroSlide(id) {
+  if (!confirm('确认删除此轮播页？')) return;
+  try { await api(`/api/hero-slides/${id}`, 'DELETE'); toast('已删除'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== FOOTER ICONS ======
+function renderFooterIcons() {
+  const icons = SITE_DATA.footerIcons || [];
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>🔗 页脚媒体图标</h2>
+      <p class="section-desc">管理页面底部"关注我们"区域的 2x2 媒体平台图标（纯图片展示，可上传替换）</p>
+    ${icons.map((ico, i) => `
+      <div class="card">
+        <h3>图标 #${i+1}: ${esc(ico.name || '未设置')}</h3>
+        <div class="form-group"><label>平台名称</label><input id="fi-${i}-name" value="${esc(ico.name||'')}"></div>
+        ${imagePicker(`fi-${i}-img`, ico.imageUrl, 'footer')}
+        <p style="font-size:10px;color:var(--muted);margin-top:4px;">前端展示为纯图片，无点击跳转，建议上传透明 PNG 图标</p>
+        <div class="form-row">
+          <div class="form-group"><label>排序</label><input id="fi-${i}-order" value="${ico.sortOrder||i+1}" type="number"></div>
+          <div class="form-group" style="align-self:end;"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px;">
+            <input type="checkbox" id="fi-${i}-enabled" ${ico.enabled !== false ? 'checked' : ''}> 启用
+          </label></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveFooterIcon(${ico.id},${i})">💾 保存</button>
+      </div>
+    `).join('')}
+    </div>`;
+}
+async function saveFooterIcon(id, i) {
+  const body = {
+    name: document.getElementById(`fi-${i}-name`)?.value || '',
+    imageUrl: document.getElementById(`fi-${i}-img`)?.value || null,
+    sortOrder: parseInt(document.getElementById(`fi-${i}-order`)?.value) || 1,
+    enabled: document.getElementById(`fi-${i}-enabled`)?.checked,
+  };
+  try { await api(`/api/footer-icons/${id}`, 'PUT', body); toast('图标已保存'); await refreshAll(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+// ====== MESSAGES ======
+async function renderMessages() {
+  let messages = [];
+  try { messages = await api('/api/messages'); } catch(e) { messages = []; }
+  document.getElementById('main').innerHTML = `
+    <div class="section active">
+      <h2>💬 留言墙内容管理</h2>
+      <p class="section-desc">管理留言墙全部内容：支持新增、编辑、隐藏/展示、删除留言（共 ${messages.length} 条）</p>
+      <div class="btn-group" style="margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="showAddMessageForm()">➕ 新增留言</button>
+        <button class="btn btn-outline" onclick="renderMessages()">🔄 刷新列表</button>
+      </div>
+      <div id="addMessageForm" style="display:none;"></div>
+    ${messages.length === 0 ? '<div class="card"><div class="empty-state">暂无留言</div></div>' :
+      messages.map((m, i) => `
+        <div class="card" id="msg-card-${m.id}">
+          <div style="display:flex;gap:16px;">
+            <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid var(--border);">
+                ${m.avatarUrl
+                  ? `<img src="${m.avatarUrl.startsWith('http')?m.avatarUrl:(API+m.avatarUrl)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div style="display:none;width:100%;height:100%;background:var(--accent);color:#fff;align-items:center;justify-content:center;font-size:18px;font-weight:600;">${esc((m.nickname||'匿')[0])}</div>`
+                  : `<div style="width:100%;height:100%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;">${esc((m.nickname||'匿')[0])}</div>`
+                }
+              </div>
+              ${imagePicker('msg-'+i+'-avatar', m.avatarUrl || '', 'messages')
+                .replace(/图片URL/g,'头像URL').replace(/上传新图/g,'上传头像')}
+            </div>
+            <div style="flex:1;">
+              <div class="form-row">
+                <div class="form-group"><label>昵称</label><input id="msg-${i}-nickname" value="${esc(m.nickname||'')}"></div>
+                <div class="form-group"><label>邮箱</label><input id="msg-${i}-email" value="${esc(m.email||'')}"></div>
+              </div>
+              <div class="form-group"><label>留言内容</label><textarea id="msg-${i}-content">${esc(m.content||'')}</textarea></div>
+              <div class="form-row">
+                <div class="form-group"><label>发布时间</label><input id="msg-${i}-createdAt" type="datetime-local" value="${m.createdAt ? new Date(m.createdAt).toISOString().slice(0,16) : ''}"></div>
+                <div class="form-group" style="align-self:end;"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px;">
+                  <input type="checkbox" id="msg-${i}-enabled" ${m.enabled !== false ? 'checked' : ''}> 展示在留言墙
+                </label></div>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveMessage(${m.id},${i})">💾 保存</button>
+                <button class="btn btn-danger" onclick="deleteMessage(${m.id})">🗑 删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function showAddMessageForm() {
+  const now = new Date().toISOString().slice(0, 16);
+  document.getElementById('addMessageForm').style.display = 'block';
+  document.getElementById('addMessageForm').innerHTML = `
+    <div class="card" style="border:2px dashed var(--accent);">
+      <h3>➕ 新增留言</h3>
+      <div class="form-row">
+        <div class="form-group"><label>昵称 <span style="color:var(--danger)">*</span></label><input id="new-msg-nickname" placeholder="用户昵称"></div>
+        <div class="form-group"><label>邮箱</label><input id="new-msg-email" placeholder="选填"></div>
+      </div>
+      <div class="form-group"><label>留言内容 <span style="color:var(--danger)">*</span></label><textarea id="new-msg-content" placeholder="留言正文..."></textarea></div>
+      <div class="form-group"><label>发布时间</label><input id="new-msg-createdAt" type="datetime-local" value="${now}"></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="addMessage()">💾 确认添加</button>
+        <button class="btn btn-outline" onclick="document.getElementById('addMessageForm').style.display='none'">取消</button>
+      </div>
+    </div>`;
+  document.getElementById('addMessageForm').scrollIntoView({ behavior:'smooth' });
+}
+
+async function addMessage() {
+  const body = {
+    nickname: document.getElementById('new-msg-nickname')?.value?.trim() || '',
+    email: document.getElementById('new-msg-email')?.value?.trim() || '',
+    content: document.getElementById('new-msg-content')?.value?.trim() || '',
+    createdAt: document.getElementById('new-msg-createdAt')?.value || null,
+    enabled: true,
+  };
+  if (!body.nickname) { toast('昵称不能为空', 'error'); return; }
+  if (!body.content) { toast('留言内容不能为空', 'error'); return; }
+  try { await api('/api/messages', 'POST', body); toast('留言已添加'); await renderMessages(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+async function saveMessage(id, i) {
+  const body = {
+    nickname: document.getElementById('msg-'+i+'-nickname')?.value || '',
+    email: document.getElementById('msg-'+i+'-email')?.value || '',
+    content: document.getElementById('msg-'+i+'-content')?.value || '',
+    avatarUrl: document.getElementById('msg-'+i+'-avatar')?.value || null,
+    createdAt: document.getElementById('msg-'+i+'-createdAt')?.value ? new Date(document.getElementById('msg-'+i+'-createdAt').value).toISOString() : null,
+    enabled: document.getElementById('msg-'+i+'-enabled')?.checked,
+  };
+  try { await api('/api/messages/'+id, 'PUT', body); toast('留言已保存'); await renderMessages(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteMessage(id) {
+  if (!confirm('确认删除此留言？此操作不可撤销。')) return;
+  try { await api('/api/messages/'+id, 'DELETE'); toast('留言已删除'); await renderMessages(); }
   catch(e) { toast(e.message, 'error'); }
 }
 

@@ -38,6 +38,10 @@ public class TeamInfo {
     @Column(columnDefinition = "TEXT")
     private String motto;
 
+    /** 青年愿景配图 */
+    @Column(name = "mission_image_url", length = 500)
+    private String missionImageUrl;
+
     /** 首屏封面大图 (Hero background) */
     @Column(name = "image_url")
     private String imageUrl;
@@ -88,6 +92,8 @@ public class TeamInfo {
     public void setMissionDesc(String missionDesc) { this.missionDesc = missionDesc; }
     public String getMotto() { return motto; }
     public void setMotto(String motto) { this.motto = motto; }
+    public String getMissionImageUrl() { return missionImageUrl; }
+    public void setMissionImageUrl(String missionImageUrl) { this.missionImageUrl = missionImageUrl; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public String getHeroImageUrl() { return heroImageUrl; }

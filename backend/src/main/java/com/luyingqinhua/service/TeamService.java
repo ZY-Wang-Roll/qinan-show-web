@@ -40,6 +40,7 @@ public class TeamService {
         if (updated.getMissionTitle() != null) info.setMissionTitle(updated.getMissionTitle());
         if (updated.getMissionDesc() != null) info.setMissionDesc(updated.getMissionDesc());
         if (updated.getMotto() != null) info.setMotto(updated.getMotto());
+        if (updated.getMissionImageUrl() != null) info.setMissionImageUrl(updated.getMissionImageUrl());
         if (updated.getImageUrl() != null) info.setImageUrl(updated.getImageUrl());
         if (updated.getHeroImageUrl() != null) info.setHeroImageUrl(updated.getHeroImageUrl());
         if (updated.getTeamLogoUrl() != null) info.setTeamLogoUrl(updated.getTeamLogoUrl());

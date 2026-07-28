@@ -13,7 +13,7 @@
       data-od-id="site-nav"
     >
       <div class="content-wrapper flex items-center justify-between h-16 sm:h-20">
-        <a href="#hero" class="display-md text-lg sm:text-xl tracking-wide" data-od-id="nav-logo">鹿映秦华</a>
+        <a href="#hero" class="text-2xl sm:text-3xl font-bold tracking-[0.15em] hover:text-accent transition-colors duration-300" style="font-family: 'Ma Shan Zheng', 'ZCOOL XiaoWei', 'KaiTi', 'STKaiti', serif;" data-od-id="nav-logo">鹿映秦华</a>
         <div class="hidden lg:flex items-center gap-8 text-sm tracking-wider">
           <a v-for="item in navItems" :key="item.id" :href="item.href"
              class="link-underline text-[var(--color-fg)]/70 hover:text-[var(--color-fg)] transition-colors duration-300"
@@ -40,30 +40,49 @@
       </transition>
     </nav>
 
-    <!-- ==================== 1. HERO ==================== -->
-    <section id="hero" class="section-container relative h-screen flex items-center" data-od-id="section-hero">
+    <!-- ==================== 1. HERO CAROUSEL ==================== -->
+    <section id="hero" class="section-container relative h-screen flex items-center" data-od-id="section-hero"
+             @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay" @touchstart="stopAutoPlay" @touchend="startAutoPlay">
       <div class="absolute inset-0 overflow-hidden">
         <div ref="heroParallax" class="absolute inset-0 parallax-bg">
-          <div class="absolute inset-0">
-            <img v-if="teamInfo.imageUrl" :src="imgUrl(teamInfo.imageUrl)" class="absolute inset-0 w-full h-full object-cover" alt="" />
+          <!-- Carousel slides -->
+          <div v-for="(slide, idx) in heroSlides" :key="idx"
+               :class="['absolute inset-0 transition-opacity duration-1000 ease-in-out',
+                        idx === currentSlide ? 'opacity-100' : 'opacity-0']">
+            <img v-if="slide.imageUrl" :src="originalUrl(slide.imageUrl)" class="absolute inset-0 w-full h-full object-cover" alt="" />
             <div v-else class="ph-img absolute inset-0"></div>
-            <div class="absolute inset-0 bg-gradient-to-b from-warm-900/25 via-warm-900/12 to-warm-900/35 z-10"></div>
-            <div class="absolute inset-0 flex items-center justify-center z-0">
-              <div class="text-warm-300/50 text-sm tracking-ultra">秦安航拍 · 纪实摄影</div>
-            </div>
           </div>
+          <div class="absolute inset-0 bg-gradient-to-b from-warm-900/25 via-warm-900/12 to-warm-900/35 z-10"></div>
         </div>
       </div>
-      <div class="content-wrapper relative z-10 w-full flex flex-col items-start justify-center h-full pt-20">
-        <p class="eyebrow mb-4 sm:mb-6 opacity-80 fade-up" data-anim="hero">LUYING QINHUA · 2025</p>
-        <h1 class="display-xl text-white max-w-4xl fade-up delay-100" data-anim="hero-title">
-          鹿映秦华
+
+      <!-- Left/Right navigation buttons -->
+      <button @click="prevSlide" aria-label="上一张"
+              class="absolute left-3 sm:left-6 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center
+                     bg-white/10 hover:bg-white/25 backdrop-blur-sm text-white/70 hover:text-white
+                     transition-all duration-300 border border-white/20 hover:border-white/40">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button @click="nextSlide" aria-label="下一张"
+              class="absolute right-3 sm:right-6 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center
+                     bg-white/10 hover:bg-white/25 backdrop-blur-sm text-white/70 hover:text-white
+                     transition-all duration-300 border border-white/20 hover:border-white/40">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <!-- Text overlay - 标题与轮播图一一绑定，平滑过渡 -->
+      <div class="content-wrapper relative z-10 w-full flex flex-col items-start justify-center h-full pt-6 sm:pt-10">
+        <p ref="heroEyebrowEl" class="hero-slide-text eyebrow mb-4 sm:mb-6 opacity-80 text-white/80"
+           data-anim="hero">{{ currentSlideData.subtitle || 'LUYING QINHUA · 2025' }}</p>
+        <h1 ref="heroTitleEl" class="hero-slide-text display-xl text-white max-w-4xl"
+            data-anim="hero-title">
+          {{ currentSlideData.title || '鹿映秦华' }}
         </h1>
-        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mt-6 sm:mt-10 max-w-2xl fade-up delay-200" data-anim="hero-desc">
+        <div ref="heroDescEl" class="hero-slide-text flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mt-6 sm:mt-10 max-w-2xl"
+             data-anim="hero-desc">
           <span class="h-[1px] w-12 bg-white/40 hidden sm:block"></span>
-          <p class="text-white/70 text-base sm:text-lg leading-relaxed tracking-wide font-light">
-            赴甘肃天水秦安 · 乡村振兴社会实践<br class="sm:hidden" />青年力量赋能乡土新生
-          </p>
+          <p class="text-white/70 text-base sm:text-lg leading-relaxed tracking-wide font-light"
+             v-html="(currentSlideData.description || '赴甘肃天水秦安 · 乡村振兴社会实践<br/>青年力量赋能乡土新生').replace(/\n/g, '<br/>')"></p>
         </div>
         <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 scroll-hint-anim fade-up delay-500" data-anim="hero-scroll">
           <span class="text-white/50 text-xs tracking-ultra">向下探索</span>
@@ -72,6 +91,13 @@
             <circle cx="8" cy="7" r="2" fill="currentColor"/>
           </svg>
         </div>
+      </div>
+
+      <!-- Slide indicators (dots) -->
+      <div class="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
+        <button v-for="(s, i) in heroSlides" :key="'dot-'+i" @click="goToSlide(i)" :aria-label="'第'+(i+1)+'张'"
+                :class="['w-2 h-2 rounded-full transition-all duration-500',
+                         i === currentSlide ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60']"></button>
       </div>
     </section>
 
@@ -166,14 +192,24 @@
           </div>
         </div>
 
-        <!-- mission statement - offset layout -->
-        <div class="mt-20 sm:mt-28 lg:mt-36 lg:ml-auto lg:w-[62%] space-y-6 fade-up" data-anim="team-mission">
-          <p class="eyebrow">青年愿景</p>
-          <h3 class="display-md" v-html="teamInfo.missionTitle">
-          </h3>
-          <p class="body-md max-w-lg">
-            {{ teamInfo.missionDesc }}
-          </p>
+        <!-- 青年愿景 - 左图右文布局 -->
+        <div class="mt-20 sm:mt-28 lg:mt-36 flex flex-col lg:flex-row items-center gap-10 lg:gap-20">
+          <!-- 左侧图片区域 -->
+          <div class="lg:w-[45%] w-full rounded-sm overflow-hidden fade-in-scale" data-anim="mission-img">
+            <img v-if="teamInfo.missionImageUrl" :src="originalUrl(teamInfo.missionImageUrl)" class="w-full aspect-[4/3] object-cover rounded-sm" alt="青年愿景" loading="lazy" />
+            <div v-else class="ph-img aspect-[4/3] rounded-sm flex items-center justify-center">
+              <span class="text-warm-300/50 text-sm tracking-wider">青年愿景 · 影像纪实</span>
+            </div>
+          </div>
+          <!-- 右侧文字区域 -->
+          <div class="lg:w-[55%] space-y-6 fade-up" data-anim="team-mission">
+            <p class="eyebrow">青年愿景</p>
+            <h3 class="display-md" v-html="teamInfo.missionTitle">
+            </h3>
+            <p class="body-md max-w-lg">
+              {{ teamInfo.missionDesc }}
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -341,23 +377,149 @@
           </div>
         </div>
 
-        <!-- story snippets -->
-        <div class="mt-20 sm:mt-28 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-          <div v-for="(story, i) in stories" :key="i"
-                :style="{ transitionDelay: (i * 0.15) + 's' }"
-                :data-anim="'story-' + i"
-                class="fade-in-soft group cursor-default"
-                :data-od-id="'story-card-' + i">
-             <span class="font-number text-5xl sm:text-6xl font-bold text-warm-200 opacity-50 block -mb-3">{{ String(i + 1).padStart(2, '0') }}</span>
-             <h4 class="display-md mt-2 group-hover:text-accent transition-colors duration-300">{{ story.title }}</h4>
-             <p class="body-md mt-3 leading-relaxed">{{ story.desc }}</p>
+      </div>
+    </section>
+
+    <!-- ==================== 5.5 三大实践价值板块 ==================== -->
+    <section id="values" class="section-container section-gradient-bg section-shadow py-24 sm:py-32 lg:py-40" data-od-id="section-values">
+      <div class="content-wrapper">
+        <div class="mb-16 sm:mb-20 fade-up" data-anim="values-header">
+          <p class="eyebrow">实践价值</p>
+          <h2 class="display-lg mt-4">青春力量<br /><span class="text-accent">赋能乡土</span></h2>
+          <p class="section-subtitle mt-3">三个维度，见证青年与乡村的双向奔赴</p>
+        </div>
+
+        <!-- 三大板块纵向堆叠 -->
+        <div v-for="(story, i) in stories" :key="'value-'+i"
+             :class="['flex flex-col gap-8 lg:gap-0 items-center mb-20 lg:mb-28 last:mb-0',
+                      i % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row']">
+          <!-- 图片区域 -->
+          <div :class="['lg:w-[52%] rounded-sm overflow-hidden fade-in-scale']"
+               :data-anim="'value-img-'+i">
+            <img v-if="story.imageUrl" :src="originalUrl(story.imageUrl)" class="w-full aspect-[4/3] object-cover rounded-sm" alt="" loading="lazy" />
+            <div v-else class="ph-img aspect-[4/3] rounded-sm flex flex-col items-center justify-center gap-2"
+                 :style="{ background: valueCardBg(i) }">
+              <span class="text-4xl sm:text-5xl opacity-40">{{ valueCardIcon(i) }}</span>
+              <span class="text-warm-300/60 text-xs tracking-wider">{{ story.title }} · 实拍影像</span>
+            </div>
+          </div>
+          <!-- 文字区域 -->
+          <div :class="['lg:w-[48%] z-10 flex flex-col items-start space-y-5 bg-[var(--color-surface)] p-8 sm:p-10 lg:p-12 shadow-sm fade-up',
+                        i % 2 === 1 ? 'lg:-mr-8 lg:mt-14' : 'lg:-ml-8 lg:mt-14']"
+               :data-anim="'value-text-'+i"
+               :style="{ transitionDelay: (i * 0.15) + 's' }">
+            <span class="font-number text-6xl sm:text-7xl font-bold text-accent/15 block -mb-4 -ml-1 select-none">
+              {{ String(i + 1).padStart(2, '0') }}
+            </span>
+            <h3 class="display-md">{{ story.title }}</h3>
+            <div class="accent-line w-16"></div>
+            <p class="body-md leading-relaxed">{{ story.desc }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==================== 6. CLOSING / FOOTER ==================== -->
-    <section id="closing" class="section-container relative py-32 sm:py-40 lg:py-52 overflow-hidden" data-od-id="section-closing">
+    <!-- ==================== MESSAGE INTERACTION ==================== -->
+    <section id="message" class="section-container bg-[var(--color-surface)] section-shadow py-24 sm:py-32 lg:py-40" data-od-id="section-message">
+      <div class="content-wrapper">
+        <div class="mb-16 sm:mb-20 fade-up" data-anim="message-header">
+          <p class="eyebrow">互动社区</p>
+          <h2 class="display-lg mt-4">留言<span class="text-accent">互动</span></h2>
+          <p class="section-subtitle mt-3">留下你的足迹，与我们共同见证秦安的每一步成长</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+          <!-- ====== 留言板（表单） ====== -->
+          <div class="fade-up" data-anim="message-board">
+            <h3 class="display-md mb-2">📝 留言板</h3>
+            <p class="body-sm mb-8 text-warm-500">写下你想说的话，我们珍视每一份声音</p>
+            <form @submit.prevent="submitMessage" class="space-y-6">
+              <!-- 昵称 -->
+              <div>
+                <label for="msg-nickname" class="block text-sm text-warm-700 mb-2 tracking-wide">
+                  昵称 <span class="text-accent-deep">*</span>
+                </label>
+                <input id="msg-nickname" v-model="messageForm.nickname" type="text" required
+                       placeholder="你的昵称"
+                       class="w-full px-4 py-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg
+                              text-warm-800 placeholder-warm-400 text-sm tracking-wide
+                              focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+                              transition-all duration-300" />
+              </div>
+              <!-- 邮箱 -->
+              <div>
+                <label for="msg-email" class="block text-sm text-warm-700 mb-2 tracking-wide">邮箱</label>
+                <input id="msg-email" v-model="messageForm.email" type="email"
+                       placeholder="your@email.com（选填）"
+                       class="w-full px-4 py-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg
+                              text-warm-800 placeholder-warm-400 text-sm tracking-wide
+                              focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+                              transition-all duration-300" />
+              </div>
+              <!-- 留言内容 -->
+              <div>
+                <label for="msg-content" class="block text-sm text-warm-700 mb-2 tracking-wide">
+                  留言内容 <span class="text-accent-deep">*</span>
+                </label>
+                <textarea id="msg-content" v-model="messageForm.content" rows="5" required
+                          placeholder="分享你的感想..."
+                          class="w-full px-4 py-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg
+                                 text-warm-800 placeholder-warm-400 text-sm tracking-wide resize-none
+                                 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+                                 transition-all duration-300"></textarea>
+              </div>
+              <!-- 提交按钮 -->
+              <button type="submit" :disabled="submittingMsg"
+                      class="w-full sm:w-auto px-8 py-3 bg-accent text-white rounded-lg text-sm tracking-wider
+                             hover:bg-accent-deep disabled:opacity-50 disabled:cursor-not-allowed
+                             transition-all duration-300 font-medium">
+                {{ submittingMsg ? '提交中...' : '提交留言' }}
+              </button>
+              <!-- 提示信息 -->
+              <p v-if="submitMsgFeedback" :class="['text-xs mt-2', submitMsgOk ? 'text-mist-deep' : 'text-red-400']">
+                {{ submitMsgFeedback }}
+              </p>
+            </form>
+          </div>
+
+          <!-- ====== 留言墙（无限滚动） ====== -->
+          <div class="fade-up delay-200" data-anim="message-wall">
+            <h3 class="display-md mb-2">💬 留言墙</h3>
+            <p class="body-sm mb-8 text-warm-500">来自各地朋友的温暖留言</p>
+            <div ref="messageWallRef"
+                 class="rounded-xl border border-[var(--color-border)] overflow-hidden bg-[var(--color-bg)]"
+                 @mouseenter="pauseMessageScroll" @mouseleave="resumeMessageScroll"
+                 style="height: 480px;">
+              <div ref="messageScrollInner" class="message-wall-scroll py-6 px-5 space-y-4"
+                   :class="{ paused: messageScrollPaused }">
+                <!-- displayMessages: 三倍列表实现无缝滚动 -->
+                <div v-for="(msg, idx) in displayMessages" :key="'dmsg-'+idx"
+                     class="message-card p-5 bg-white rounded-lg border border-[var(--color-border)] shadow-sm">
+                  <div class="flex items-start justify-between gap-3 mb-2">
+                    <div class="flex items-center gap-3">
+                      <!-- 头像：有自定义图片则显示图片，否则显示首字母头像 -->
+                      <div v-if="msg.avatarUrl" class="msg-avatar-img-wrap">
+                        <img :src="originalUrl(msg.avatarUrl)" class="msg-avatar-img" :alt="msg.nickname" />
+                      </div>
+                      <div v-else class="msg-avatar-text"
+                           :style="{ background: avatarColor(msg.nickname || '匿名') }">
+                        {{ (msg.nickname || '匿')[0] }}
+                      </div>
+                      <span class="font-medium text-sm text-warm-800">{{ msg.nickname || '匿名用户' }}</span>
+                    </div>
+                    <span class="text-xs text-warm-400 whitespace-nowrap">{{ formatMsgTime(msg.createdAt) }}</span>
+                  </div>
+                  <p class="text-sm text-warm-600 leading-relaxed">{{ msg.content }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== CLOSING / FOOTER ==================== -->
+    <section id="closing" class="section-container relative py-24 sm:py-32 lg:py-36 overflow-hidden" data-od-id="section-closing">
       <div class="absolute inset-0 overflow-hidden">
         <div class="absolute inset-0">
           <img v-if="closingBgImage" :src="imgUrl(closingBgImage)" class="absolute inset-0 w-full h-full object-cover" alt="" />
@@ -366,24 +528,48 @@
         <div class="absolute inset-0 bg-warm-900/35 backdrop-blur-[2px]"></div>
         <div class="absolute inset-0 closing-glow"></div>
       </div>
-      <div class="content-wrapper relative z-10 flex flex-col items-center text-center">
-        <div class="flex flex-col lg:flex-row items-center lg:items-end gap-6 lg:gap-12 max-w-4xl mx-auto fade-up" data-anim="closing-title">
-          <h2 class="display-xl text-white text-center">{{ clBrand }}</h2>
-          <p class="text-white/60 text-base sm:text-lg leading-relaxed tracking-wide font-light lg:text-left lg:pb-3">
-            {{ clSubtitle }}
-          </p>
+      <div class="content-wrapper relative z-10">
+        <div class="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-16">
+          <!-- 左侧文字组：向左上角偏移 -->
+          <div class="flex flex-col items-start text-left space-y-4 lg:pt-0 fade-up" data-anim="closing-left">
+            <h2 class="display-lg text-white" style="font-family: 'Ma Shan Zheng', 'ZCOOL XiaoWei', 'KaiTi', 'STKaiti', serif;">
+              {{ clBrand }}
+            </h2>
+            <p class="text-white/50 text-sm leading-relaxed tracking-wide max-w-xs">
+              {{ clSubtitle }}
+            </p>
+            <div class="flex flex-wrap gap-4 sm:gap-6 pt-4 text-white/40 text-xs tracking-wide">
+              <button @click="sharePage" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-share">分享本站</button>
+              <a href="mailto:luyingqinhua@example.com" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-email">联系我们</a>
+              <a href="#hero" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-top">返回顶部</a>
+            </div>
+          </div>
+
+          <!-- 右侧：媒体平台图标区域 - 2x2 统一尺寸纯图片展示 -->
+          <div class="flex flex-col items-end gap-4 lg:pt-0 fade-up delay-200" data-anim="closing-right">
+            <span class="text-white/30 text-xs tracking-ultra uppercase">关注我们</span>
+            <div class="footer-icon-grid">
+              <div class="footer-icon-cell" title="小红书">
+                <img src="/footer-icon-1.png" class="footer-icon-img" alt="小红书" />
+              </div>
+              <div class="footer-icon-cell" title="视频号">
+                <img src="/footer-icon-2.png" class="footer-icon-img" alt="视频号" />
+              </div>
+              <div class="footer-icon-cell" title="快手">
+                <img src="/footer-icon-3.png" class="footer-icon-img" alt="快手" />
+              </div>
+              <div class="footer-icon-cell" title="抖音">
+                <img src="/footer-icon-4.png" class="footer-icon-img" alt="抖音" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-6 sm:gap-10 mt-16 sm:mt-20 text-white/50 text-sm tracking-wide fade-up delay-200" data-anim="closing-links">
-          <button @click="sharePage" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-share">分享本站</button>
-          <a href="mailto:luyingqinhua@example.com" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-email">联系我们</a>
-          <a href="#hero" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-top">返回顶部</a>
-        </div>
-
-        <div class="mt-12 sm:mt-16 w-full max-w-md mx-auto">
-          <div class="h-[1px] w-full bg-white/10 mb-6"></div>
-          <p class="text-white/30 text-xs tracking-wide text-center">
-            &copy; 2025 鹿映秦华实践队 · 青年助力乡村振兴
+        <!-- 底部版权条 -->
+        <div class="mt-12 sm:mt-16">
+          <div class="h-[1px] w-full bg-white/10 mb-5"></div>
+          <p class="text-white/25 text-xs tracking-wide text-center lg:text-left">
+            &copy; 2026 鹿映秦华实践队 · 青年助力乡村振兴
           </p>
         </div>
       </div>
@@ -420,7 +606,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
 const navScrolled = ref(false)
 const mobileOpen = ref(false)
@@ -428,11 +614,195 @@ const lightboxOpen = ref(false)
 const lightboxId = ref('')
 const lightboxImageUrl = ref('')
 const heroParallax = ref(null)
+const heroEyebrowEl = ref(null)
+const heroTitleEl = ref(null)
+const heroDescEl = ref(null)
 const progressBar = ref(null)
 const particleCanvas = ref(null)
 
-// ======  API 配置 ======
-const API_BASE = '' // 空=相对路径：开发时 Vite 代理到 8080，线上同源
+// ====== Hero Carousel ======
+const currentSlide = ref(0)
+let autoPlayTimer = null
+
+const currentSlideData = computed(() => {
+  const slides = heroSlides.value
+  if (slides && slides.length > 0) {
+    return slides[currentSlide.value] || slides[0]
+  }
+  return { title: '鹿映秦华', subtitle: 'LUYING QINHUA · 2025', description: '赴甘肃天水秦安 · 乡村振兴社会实践\n青年力量赋能乡土新生' }
+})
+
+const heroSlides = computed(() => {
+  if (pageData.value?.heroSlides && pageData.value.heroSlides.length > 0) {
+    return pageData.value.heroSlides.filter(s => s.enabled !== false)
+  }
+  // 兜底：单张默认轮播
+  return [{ imageUrl: '', title: '鹿映秦华', subtitle: 'LUYING QINHUA · 2025', description: '赴甘肃天水秦安 · 乡村振兴社会实践\n青年力量赋能乡土新生', enabled: true }]
+})
+
+function nextSlide() {
+  currentSlide.value = (currentSlide.value + 1) % heroSlides.value.length
+}
+function prevSlide() {
+  currentSlide.value = (currentSlide.value - 1 + heroSlides.value.length) % heroSlides.value.length
+}
+function goToSlide(idx) {
+  currentSlide.value = idx
+  resetAutoPlay()
+}
+function startAutoPlay() {
+  stopAutoPlay()
+  autoPlayTimer = setInterval(nextSlide, 5000)
+}
+function stopAutoPlay() {
+  if (autoPlayTimer) { clearInterval(autoPlayTimer); autoPlayTimer = null }
+}
+function resetAutoPlay() {
+  stopAutoPlay()
+  startAutoPlay()
+}
+
+// Hero 文字切换过渡：每次切片时先闪隐再闪现
+watch(currentSlide, () => {
+  const els = [heroEyebrowEl.value, heroTitleEl.value, heroDescEl.value].filter(Boolean)
+  if (!els.length) return
+  els.forEach(el => {
+    el.classList.remove('hero-text-visible')
+    el.style.opacity = '0'
+    el.style.transform = 'translateY(12px)'
+  })
+  setTimeout(() => {
+    els.forEach(el => {
+      el.style.opacity = '1'
+      el.style.transform = 'translateY(0)'
+      el.classList.add('hero-text-visible')
+    })
+  }, 150)
+}, { flush: 'post' })
+
+// 页脚媒体图标（2x2 纯图片展示）
+const footerIcons = computed(() => {
+  const icons = pageData.value?.footerIcons
+  if (icons && icons.length > 0) {
+    const enabled = icons.filter(i => i.enabled !== false)
+    if (enabled.length >= 4) return enabled.slice(0, 4)
+  }
+  // 兜底占位
+  return [
+    { id: 1, name: '小红书', imageUrl: '', enabled: true },
+    { id: 2, name: '视频号', imageUrl: '', enabled: true },
+    { id: 3, name: '快手', imageUrl: '', enabled: true },
+    { id: 4, name: '抖音', imageUrl: '', enabled: true },
+  ]
+})
+
+// ====== 留言互动 ======
+const messageForm = ref({ nickname: '', email: '', content: '' })
+const submittingMsg = ref(false)
+const submitMsgFeedback = ref('')
+const submitMsgOk = ref(false)
+const messages = ref([])
+const messageWallRef = ref(null)
+const messageScrollInner = ref(null)
+const messageScrollPaused = ref(false)
+
+// 最小6条（仅展示 enabled 的留言），不足则补齐
+const paddedMessages = computed(() => {
+  const list = (messages.value || []).filter(m => m.enabled !== false)
+  if (list.length === 0) return []
+  if (list.length >= 6) return list
+  const result = [...list]
+  while (result.length < 6) {
+    for (let i = 0; i < list.length && result.length < 6; i++) {
+      result.push(list[i])
+    }
+  }
+  return result.slice(0, 6)
+})
+
+// 三倍复制实现无缝无限滚动
+const displayMessages = computed(() => {
+  const base = paddedMessages.value
+  if (!base || base.length === 0) return []
+  return [...base, ...base, ...base]
+})
+
+// 头像背景色
+function avatarColor(name) {
+  const colors = ['#d4c4a8', '#b8cfc9', '#e8d5c4', '#c8d6cf', '#d4c8b8', '#c0d4c8']
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return colors[Math.abs(hash) % colors.length]
+}
+
+// 格式化留言时间
+function formatMsgTime(t) {
+  if (!t) return ''
+  const d = new Date(t)
+  const now = new Date()
+  const diff = now - d
+  if (diff < 60000) return '刚刚'
+  if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
+  if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
+  if (diff < 604800000) return Math.floor(diff / 86400000) + '天前'
+  return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+}
+
+function pauseMessageScroll() { messageScrollPaused.value = true }
+function resumeMessageScroll() { messageScrollPaused.value = false }
+
+// 提交留言
+async function submitMessage() {
+  if (!messageForm.value.nickname.trim() || !messageForm.value.content.trim()) return
+  submittingMsg.value = true
+  submitMsgFeedback.value = ''
+  try {
+    const res = await fetch(`${API_BASE}/api/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nickname: messageForm.value.nickname.trim(),
+        email: messageForm.value.email.trim(),
+        content: messageForm.value.content.trim(),
+      }),
+    })
+    const json = await res.json()
+    if (json.code === 200) {
+      submitMsgFeedback.value = '✅ 留言提交成功！感谢你的参与。'
+      submitMsgOk.value = true
+      messageForm.value = { nickname: '', email: '', content: '' }
+      // 刷新留言墙
+      await fetchMessages()
+    } else {
+      submitMsgFeedback.value = json.message || '提交失败，请稍后重试'
+      submitMsgOk.value = false
+    }
+  } catch (e) {
+    submitMsgFeedback.value = '网络异常，请稍后重试'
+    submitMsgOk.value = false
+  } finally {
+    submittingMsg.value = false
+    // 3秒后清除反馈
+    setTimeout(() => { submitMsgFeedback.value = '' }, 5000)
+  }
+}
+
+// 获取留言列表
+async function fetchMessages() {
+  try {
+    const res = await fetch(`${API_BASE}/api/messages`)
+    const json = await res.json()
+    if (json.code === 200 && json.data && json.data.length > 0) {
+      messages.value = json.data
+    } else {
+      messages.value = defaults.seedMessages
+    }
+  } catch (e) {
+    console.warn('获取留言失败，使用种子数据:', e.message)
+    messages.value = defaults.seedMessages
+  }
+}
+const API_BASE = 'http://39.96.75.245:8080'
 const loading = ref(true)
 const pageData = ref(null)
 
@@ -443,6 +813,7 @@ const defaults = {
     { id: 'culture', label: '秦安文化', href: '#culture' },
     { id: 'products', label: '农产品', href: '#products' },
     { id: 'documentary', label: '实践纪实', href: '#documentary' },
+    { id: 'message', label: '留言互动', href: '#message' },
     { id: 'closing', label: '关于', href: '#closing' },
   ],
   teamInfo: {
@@ -451,6 +822,7 @@ const defaults = {
     description: '鹿映秦华实践队由来自多所高校的青年学子组成，聚焦甘肃秦安乡村振兴一线，以影像记录、田野调研、产品助销为核心，用青年视角讲述乡土故事。',
     missionTitle: '以镜头为笔，<br />以土地为卷，<br />书写乡村的当代叙事。',
     missionDesc: '我们相信，乡村振兴不只是基建与产业，更是文化与记忆的延续。鹿映秦华以青年视角重新发现乡土价值，让每寸土地的故事被看见。',
+    missionImageUrl: '',
     motto: '" 用镜头记录变迁，用脚步丈量土地，用青春回应时代。"',
   },
   teamStats: [
@@ -495,14 +867,48 @@ const defaults = {
     { label: '丰收时节助农', cols: 2, rows: 1, time: '7月20日 · 王铺镇', note: '直播助销秦安蜜桃', bg: 'linear-gradient(142deg, #e0ccc0 0%, #c4a080 42%, #a88060 100%)', icon: '📦' },
   ],
   stories: [
-    { title: '走进田间地头', desc: '队员们深入秦安多个村庄，走进果园、椒田，与农户面对面交流，了解产业发展现状与真实需求。' },
-    { title: '记录乡土变迁', desc: '用镜头记录秦安传统村落的新旧更迭，见证乡村振兴战略给这片土地带来的深刻变化。' },
-    { title: '青春赋能乡土', desc: '发挥青年学子的专业优势，为秦安农产品品牌化、电商化提供方案建议与技术支撑。' },
+    { title: '走进田间地头', desc: '队员们深入秦安多个村庄，走进果园、椒田，与农户面对面交流，了解产业发展现状与真实需求。', imageUrl: '' },
+    { title: '记录乡土变迁', desc: '用镜头记录秦安传统村落的新旧更迭，见证乡村振兴战略给这片土地带来的深刻变化。', imageUrl: '' },
+    { title: '青春赋能乡土', desc: '发挥青年学子的专业优势，为秦安农产品品牌化、电商化提供方案建议与技术支撑。', imageUrl: '' },
+  ],
+  // 种子留言数据（后端不可用时的兜底数据）
+  seedMessages: [
+    { nickname: '晓风残月', email: '', content: '乡村振兴需要更多年轻人的参与和关注，鹿映秦华加油！希望秦安的蜜桃能走向全国。', avatarUrl: '', enabled: true, createdAt: '2025-07-15T10:30:00' },
+    { nickname: '田野守望者', email: '', content: '我是秦安本地人，看到你们年轻人为家乡宣传，真的很感动。欢迎大家来秦安做客！', avatarUrl: '', enabled: true, createdAt: '2025-07-16T14:20:00' },
+    { nickname: '城市旅人', email: '', content: '去过一次秦安，被那里的淳朴和美景深深吸引。期待你们的实践成果展示。', avatarUrl: '', enabled: true, createdAt: '2025-07-17T09:15:00' },
+    { nickname: '文化爱好者', email: '', content: '大地湾遗址和麦积山石窟都是华夏文明的瑰宝，感谢你们让更多人了解这里。', avatarUrl: '', enabled: true, createdAt: '2025-07-18T16:45:00' },
+    { nickname: '青年志愿者', email: '', content: '同为大学生，你们的实践精神值得学习。把论文写在祖国大地上，说得太好了。', avatarUrl: '', enabled: true, createdAt: '2025-07-19T11:00:00' },
+    { nickname: '陇上人家', email: '', content: '黄土高原的儿女永远热爱这片土地。鹿映秦华，名字真好听，寓意深远。', avatarUrl: '', enabled: true, createdAt: '2025-07-20T08:30:00' },
+    { nickname: '摄影小兵', email: '', content: '纪录片的视角很棒！期待看到更多关于秦安风土人情的纪实影像。', avatarUrl: '', enabled: true, createdAt: '2025-07-21T13:00:00' },
+    { nickname: '热心网友', email: '', content: '网站做得很有格调，简约大气。祝愿秦安越来越好！', avatarUrl: '', enabled: true, createdAt: '2025-07-22T10:10:00' },
+    { nickname: '麦积烟雨', email: '', content: '天水麦积山的石窟艺术让人叹为观止，秦安小曲婉转悠扬，文化底蕴太深厚了。', avatarUrl: '', enabled: true, createdAt: '2025-07-23T15:00:00' },
+    { nickname: '蜜桃甜甜', email: '', content: '秦安水蜜桃真的太好吃了！汁多味甜，每年夏天都盼着这一口。', avatarUrl: '', enabled: true, createdAt: '2025-07-24T09:30:00' },
+    { nickname: '行走陇上', email: '', content: '从黄土高原到葫芦河畔，秦安的每一寸土地都充满了故事。致敬每一位乡村振兴的奋斗者。', avatarUrl: '', enabled: true, createdAt: '2025-07-25T11:00:00' },
+    { nickname: '归来少年', email: '', content: '毕业后回到家乡秦安工作已经三年了，看到越来越多的人关注这里，特别欣慰。', avatarUrl: '', enabled: true, createdAt: '2025-07-26T14:30:00' },
   ],
 }
 
 // ====== 从 pageData 计算派生数据 ======
-const navItems = computed(() => pageData.value?.navItems || defaults.navItems)
+const navItems = computed(() => {
+  const raw = (pageData.value?.navItems && pageData.value.navItems.length > 0)
+    ? [...pageData.value.navItems]
+    : [...defaults.navItems]
+  // 将后端字段统一映射：优先用 navId（字符串标识），否则用 id
+  const items = raw.map(n => ({
+    id: n.navId || n.id,
+    label: n.label,
+    href: n.href,
+  }))
+  // 确保「留言互动」始终存在于「实践纪实」和「关于」之间
+  const hasMessage = items.some(i => i.id === 'message')
+  if (!hasMessage) {
+    const docIdx = items.findIndex(i => i.id === 'documentary')
+    if (docIdx >= 0) {
+      items.splice(docIdx + 1, 0, { id: 'message', label: '留言互动', href: '#message' })
+    }
+  }
+  return items
+})
 const teamInfo = computed(() => pageData.value?.teamInfo || defaults.teamInfo)
 const teamStats = computed(() => pageData.value?.teamStats || defaults.teamStats)
 const teamAchievements = computed(() => pageData.value?.teamAchievements || defaults.teamAchievements)
@@ -518,7 +924,7 @@ const documentaryItems = computed(() => {
 })
 const stories = computed(() => {
   const s = pageData.value?.stories || defaults.stories
-  return s.map(st => ({ title: st.title, desc: st.description ?? st.desc ?? '' }))
+  return s.map(st => ({ title: st.title, desc: st.description ?? st.desc ?? '', imageUrl: st.imageUrl || '' }))
 })
 const closingBgImage = computed(() => pageData.value?.closingImage || '')
 const clBrand = computed(() => pageData.value?.closingBrand || '鹿映秦华')
@@ -531,6 +937,20 @@ function teamPhoto(idx) {
   const urls = [info.photo1Url, info.photo2Url, info.photo3Url, info.photo4Url]
   const labels = [info.photo1Label, info.photo2Label, info.photo3Label, info.photo4Label]
   return { url: urls[idx] || '', label: labels[idx] || '' }
+}
+
+// 三大实践价值板块 - 卡片背景色与图标
+function valueCardBg(idx) {
+  const gradients = [
+    'linear-gradient(135deg, #e8d5c4 0%, #d4b89c 50%, #c4a080 100%)',
+    'linear-gradient(160deg, #c8d6cf 0%, #9ab8a8 50%, #7a9e8c 100%)',
+    'linear-gradient(145deg, #d4c8b8 0%, #baa890 50%, #9e8b73 100%)',
+  ]
+  return gradients[idx] || gradients[0]
+}
+function valueCardIcon(idx) {
+  const icons = ['🌾', '📷', '🌟']
+  return icons[idx] || '📷'
 }
 
 // 图片 URL 处理：页面显示用 WebP 缩略图，原图仅 lightbox 用
@@ -739,6 +1159,8 @@ onMounted(async () => {
   setupObserver()
   onScroll()
   initParticles()
+  startAutoPlay()
+  fetchMessages()
 })
 
 onBeforeUnmount(() => {
@@ -747,6 +1169,7 @@ onBeforeUnmount(() => {
   if (particleAnimId) cancelAnimationFrame(particleAnimId)
   if (particleResizeTimer) clearTimeout(particleResizeTimer)
   if (particleCanvas.value && particleCanvas.value._cleanup) particleCanvas.value._cleanup()
+  stopAutoPlay()
   document.body.style.overflow = ''
 })
 </script>

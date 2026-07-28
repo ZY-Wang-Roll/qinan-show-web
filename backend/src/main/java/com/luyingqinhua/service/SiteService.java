@@ -16,16 +16,21 @@ public class SiteService {
     private final DocumentaryService documentaryService;
     private final NavService navService;
     private final SiteConfigRepository configRepo;
+    private final HeroSlideService heroSlideService;
+    private final FooterIconService footerIconService;
 
     public SiteService(TeamService teamService, CultureService cultureService,
                        ProductService productService, DocumentaryService documentaryService,
-                       NavService navService, SiteConfigRepository configRepo) {
+                       NavService navService, SiteConfigRepository configRepo,
+                       HeroSlideService heroSlideService, FooterIconService footerIconService) {
         this.teamService = teamService;
         this.cultureService = cultureService;
         this.productService = productService;
         this.documentaryService = documentaryService;
         this.navService = navService;
         this.configRepo = configRepo;
+        this.heroSlideService = heroSlideService;
+        this.footerIconService = footerIconService;
     }
 
     public Map<String, Object> getFullSiteData() {
@@ -38,6 +43,8 @@ public class SiteService {
         data.put("products", productService.getAll());
         data.put("documentaryItems", documentaryService.getAllItems());
         data.put("stories", documentaryService.getAllStories());
+        data.put("heroSlides", heroSlideService.getAll());
+        data.put("footerIcons", footerIconService.getAll());
 
         // 全站配置（closing 图片等）
         SiteConfig cfg = getConfig();
