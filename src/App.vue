@@ -802,7 +802,7 @@ async function fetchMessages() {
     messages.value = defaults.seedMessages
   }
 }
-const API_BASE = 'http://39.96.75.245:8080'
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 const loading = ref(true)
 const pageData = ref(null)
 
