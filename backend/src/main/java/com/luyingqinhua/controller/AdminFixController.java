@@ -66,6 +66,32 @@ public class AdminFixController {
                 .setParameter("old", oldPrefix).setParameter("pattern", oldPrefix + "%").executeUpdate();
         result.put("documentary_item", n5);
 
+        // hero_slide
+        int n6 = em.createQuery("UPDATE HeroSlide SET imageUrl = REPLACE(imageUrl, :old, '') WHERE imageUrl LIKE :pattern")
+                .setParameter("old", oldPrefix).setParameter("pattern", oldPrefix + "%").executeUpdate();
+        result.put("hero_slide", n6);
+
+        // story
+        int n7 = em.createQuery("UPDATE Story SET imageUrl = REPLACE(imageUrl, :old, '') WHERE imageUrl LIKE :pattern")
+                .setParameter("old", oldPrefix).setParameter("pattern", oldPrefix + "%").executeUpdate();
+        result.put("story", n7);
+
+        // team_info.missionImageUrl (via native sql)
+        int n8 = em.createNativeQuery(
+            "UPDATE team_info SET mission_image_url = REPLACE(COALESCE(mission_image_url,''), :old, '') WHERE mission_image_url LIKE :pattern")
+                .setParameter("old", oldPrefix).setParameter("pattern", oldPrefix + "%").executeUpdate();
+        result.put("team_info_mission", n8);
+
+        // footer_icon
+        int n9 = em.createQuery("UPDATE FooterIcon SET imageUrl = REPLACE(imageUrl, :old, '') WHERE imageUrl LIKE :pattern")
+                .setParameter("old", oldPrefix).setParameter("pattern", oldPrefix + "%").executeUpdate();
+        result.put("footer_icon", n9);
+
+        // message.avatarUrl
+        int n10 = em.createQuery("UPDATE Message SET avatarUrl = REPLACE(avatarUrl, :old, '') WHERE avatarUrl LIKE :pattern")
+                .setParameter("old", oldPrefix).setParameter("pattern", oldPrefix + "%").executeUpdate();
+        result.put("message_avatar", n10);
+
         int total = result.values().stream().mapToInt(Integer::intValue).sum();
         result.put("total_fixed", total);
         return Result.ok(result);
