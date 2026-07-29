@@ -115,8 +115,9 @@
               </div>
             </div>
             <p class="eyebrow fade-up" data-anim="team-eyebrow">{{ teamInfo.eyebrow }}</p>
-            <h2 class="display-lg fade-up delay-100" data-anim="team-title">
-              {{ teamInfo.title }}
+            <h2 class="display-lg fade-up delay-100 flex items-center gap-4" data-anim="team-title">
+              <span>{{ teamInfo.title }}</span>
+              <img src="/q-bixin.png" class="q-float q-team-bixin" alt="鹿少女bixin" />
             </h2>
             <p class="section-subtitle fade-up delay-150" data-anim="team-subtitle">{{ teamInfo.subtitle }}</p>
             <p class="body-lg max-w-md fade-up delay-200" data-anim="team-desc">
@@ -408,6 +409,10 @@
                         i % 2 === 1 ? 'lg:-mr-8 lg:mt-14' : 'lg:-ml-8 lg:mt-14']"
                :data-anim="'value-text-'+i"
                :style="{ transitionDelay: (i * 0.15) + 's' }">
+            <!-- Q版IP装饰：01右上 02左上 03右上 -->
+            <img v-if="i === 0" src="/q-ok.png" class="q-float q-card-corner q-card-tr" alt="鹿少女ok" />
+            <img v-if="i === 1" src="/q-ye.png" class="q-float q-card-corner q-card-tl" alt="鹿少女ye" />
+            <img v-if="i === 2" src="/q-dianzan.png" class="q-float q-card-corner q-card-tr" alt="鹿少女dianzan" />
             <span class="font-number text-6xl sm:text-7xl font-bold text-accent/15 block -mb-4 -ml-1 select-none">
               {{ String(i + 1).padStart(2, '0') }}
             </span>
@@ -424,7 +429,10 @@
       <div class="content-wrapper">
         <div class="mb-16 sm:mb-20 fade-up" data-anim="message-header">
           <p class="eyebrow">互动社区</p>
-          <h2 class="display-lg mt-4">留言<span class="text-accent">互动</span></h2>
+          <div class="flex items-center gap-4 mt-4">
+            <img src="/q-daqi.png" class="q-float q-message-daqi" alt="鹿少女daqi" />
+            <h2 class="display-lg">留言<span class="text-accent">互动</span></h2>
+          </div>
           <p class="section-subtitle mt-3">留下你的足迹，与我们共同见证秦安的每一步成长</p>
         </div>
 
@@ -538,6 +546,7 @@
             <p class="text-white/50 text-sm leading-relaxed tracking-wide max-w-xs">
               {{ clSubtitle }}
             </p>
+            <img src="/q-gaoju.png" class="q-float q-footer-gaoju" alt="鹿少女gaoju" />
             <div class="flex flex-wrap gap-4 sm:gap-6 pt-4 text-white/40 text-xs tracking-wide">
               <button @click="sharePage" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-share">分享本站</button>
               <a href="mailto:luyingqinhua@example.com" class="hover:text-accent-light transition-colors duration-300 link-underline" data-od-id="footer-email">联系我们</a>

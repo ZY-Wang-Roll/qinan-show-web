@@ -573,6 +573,59 @@
   }
 }
 
+/* ====== Q版鹿少女IP浮动动画 ====== */
+.q-float {
+  animation: qFloat 3.5s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+@keyframes qFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+/* 页面1: 团队页 - 标题右侧 */
+.q-team-bixin {
+  width: 160px;
+  height: auto;
+  margin-left: -20px;
+}
+@media (min-width: 1024px) {
+  .q-team-bixin { width: 200px; margin-left: -30px; }
+}
+/* 页面2: 三大实践卡片右上角 */
+.q-card-corner {
+  position: absolute;
+  width: 72px;
+  height: auto;
+  z-index: 5;
+}
+.q-card-tr { top: -16px; right: -16px; }
+.q-card-tl { top: -16px; left: -16px; }
+@media (max-width: 1023px) {
+  .q-card-corner { width: 56px; }
+  .q-card-tr { top: -10px; right: -10px; }
+  .q-card-tl { top: -10px; left: -10px; }
+}
+/* 页面3: 页脚 - 左侧标题下方 */
+.q-footer-gaoju {
+  width: 180px;
+  height: auto;
+  margin-top: 8px;
+}
+@media (max-width: 1023px) {
+  .q-footer-gaoju { width: 140px; }
+}
+/* 页面4: 留言页 - 标题左侧 */
+.q-message-daqi {
+  width: 160px;
+  height: auto;
+  flex-shrink: 0;
+}
+@media (min-width: 1024px) {
+  .q-message-daqi { width: 200px; }
+}
+
 /* ====== reduced-motion 可访问性 ====== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
