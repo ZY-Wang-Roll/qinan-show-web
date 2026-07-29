@@ -577,8 +577,8 @@
 .q-float {
   animation: qFloat 3.5s ease-in-out infinite;
   pointer-events: none;
-  user-select: none;
   -webkit-user-select: none;
+  user-select: none;
 }
 @keyframes qFloat {
   0%, 100% { transform: translateY(0); }
@@ -586,44 +586,58 @@
 }
 /* 页面1: 团队页 - 标题右侧 */
 .q-team-bixin {
-  width: 160px;
+  width: 200px;
   height: auto;
-  margin-left: -20px;
+  margin-left: -10px;
 }
 @media (min-width: 1024px) {
-  .q-team-bixin { width: 200px; margin-left: -30px; }
+  .q-team-bixin { width: 260px; }
 }
-/* 页面2: 三大实践卡片右上角 */
+@media (max-width: 640px) {
+  .q-team-bixin { width: 150px; margin-left: 0; }
+}
+/* 页面2: 三大实践卡片角标 - 2倍大小 */
 .q-card-corner {
   position: absolute;
-  width: 72px;
+  width: 144px;
   height: auto;
   z-index: 5;
 }
-.q-card-tr { top: -16px; right: -16px; }
-.q-card-tl { top: -16px; left: -16px; }
+.q-card-tr { top: -30px; right: -30px; }
+.q-card-tl { top: -30px; left: -30px; }
 @media (max-width: 1023px) {
-  .q-card-corner { width: 56px; }
-  .q-card-tr { top: -10px; right: -10px; }
-  .q-card-tl { top: -10px; left: -10px; }
+  .q-card-corner { width: 100px; }
+  .q-card-tr { top: -18px; right: -18px; }
+  .q-card-tl { top: -18px; left: -18px; }
+}
+@media (max-width: 640px) {
+  .q-card-corner { width: 72px; }
+  .q-card-tr { top: -14px; right: -14px; }
+  .q-card-tl { top: -14px; left: -14px; }
 }
 /* 页面3: 页脚 - 左侧标题下方 */
 .q-footer-gaoju {
-  width: 180px;
+  width: 240px;
   height: auto;
   margin-top: 8px;
 }
 @media (max-width: 1023px) {
+  .q-footer-gaoju { width: 180px; }
+}
+@media (max-width: 640px) {
   .q-footer-gaoju { width: 140px; }
 }
 /* 页面4: 留言页 - 标题左侧 */
 .q-message-daqi {
-  width: 160px;
+  width: 200px;
   height: auto;
   flex-shrink: 0;
 }
 @media (min-width: 1024px) {
-  .q-message-daqi { width: 200px; }
+  .q-message-daqi { width: 260px; }
+}
+@media (max-width: 640px) {
+  .q-message-daqi { width: 150px; }
 }
 
 /* ====== reduced-motion 可访问性 ====== */

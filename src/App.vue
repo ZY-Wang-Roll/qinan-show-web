@@ -405,7 +405,7 @@
             </div>
           </div>
           <!-- 文字区域 -->
-          <div :class="['lg:w-[48%] z-10 flex flex-col items-start space-y-5 bg-[var(--color-surface)] p-8 sm:p-10 lg:p-12 shadow-sm fade-up',
+          <div :class="['lg:w-[48%] z-10 relative flex flex-col items-start space-y-5 bg-[var(--color-surface)] p-8 sm:p-10 lg:p-12 shadow-sm fade-up',
                         i % 2 === 1 ? 'lg:-mr-8 lg:mt-14' : 'lg:-ml-8 lg:mt-14']"
                :data-anim="'value-text-'+i"
                :style="{ transitionDelay: (i * 0.15) + 's' }">
