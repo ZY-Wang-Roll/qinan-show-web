@@ -110,7 +110,7 @@
             <!-- 团队圆形 LOGO -->
             <div class="flex justify-center lg:justify-start fade-up" data-anim="team-logo">
               <div class="team-logo-wrap">
-                <img v-if="teamInfo.teamLogoUrl" :src="getThumbSrc(teamInfo.teamLogoUrl)" class="team-logo-img" alt="鹿映秦华 LOGO" />
+                <img v-if="teamInfo.teamLogoUrl" :src="getImgSrc(teamInfo.teamLogoUrl)" class="team-logo-img" alt="鹿映秦华 LOGO" />
                 <div v-else class="ph-img rounded-full" style="width:160px;height:160px;"><span class="text-warm-300/40 text-xs">LOGO</span></div>
               </div>
             </div>
@@ -157,28 +157,28 @@
             <div class="col-span-4 row-span-3 rounded-sm hover-scale cursor-pointer fade-up delay-100 overflow-hidden relative"
                  data-anim="team-img1" @click="openLightbox('team-1', teamPhoto(0).url)"
                  data-od-id="team-photo-main">
-              <img v-if="teamPhoto(0).url" :src="getThumbSrc(teamPhoto(0).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
+              <img v-if="teamPhoto(0).url" :src="getImgSrc(teamPhoto(0).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
               <div v-else class="ph-img absolute inset-0"><span class="text-warm-300/60">{{ teamPhoto(0).label || '团队合影 · 秦安田间' }}</span></div>
             </div>
             <!-- team photo 2 -->
             <div class="col-span-2 row-span-2 rounded-sm hover-scale cursor-pointer fade-up delay-200 overflow-hidden relative"
                  data-anim="team-img2" @click="openLightbox('team-2', teamPhoto(1).url)"
                  data-od-id="team-photo-workshop">
-              <img v-if="teamPhoto(1).url" :src="getThumbSrc(teamPhoto(1).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
+              <img v-if="teamPhoto(1).url" :src="getImgSrc(teamPhoto(1).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
               <div v-else class="ph-img absolute inset-0"><span class="text-warm-300/60 text-xs">{{ teamPhoto(1).label || '田间调研' }}</span></div>
             </div>
             <!-- team photo 3 -->
             <div class="col-span-3 row-span-2 rounded-sm hover-scale cursor-pointer fade-up delay-300 overflow-hidden relative"
                  data-anim="team-img3" @click="openLightbox('team-3', teamPhoto(2).url)"
                  data-od-id="team-photo-village">
-              <img v-if="teamPhoto(2).url" :src="getThumbSrc(teamPhoto(2).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
+              <img v-if="teamPhoto(2).url" :src="getImgSrc(teamPhoto(2).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
               <div v-else class="ph-img absolute inset-0"><span class="text-warm-300/60 text-xs">{{ teamPhoto(2).label || '村落走访' }}</span></div>
             </div>
             <!-- team photo 4 -->
             <div class="col-span-3 row-span-2 rounded-sm hover-scale cursor-pointer fade-up delay-400 overflow-hidden relative"
                  data-anim="team-img4" @click="openLightbox('team-4', teamPhoto(3).url)"
                  data-od-id="team-photo-discuss">
-              <img v-if="teamPhoto(3).url" :src="getThumbSrc(teamPhoto(3).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
+              <img v-if="teamPhoto(3).url" :src="getImgSrc(teamPhoto(3).url)" class="absolute inset-0 w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
               <div v-else class="ph-img absolute inset-0"><span class="text-warm-300/60 text-xs">{{ teamPhoto(3).label || '小组研讨' }}</span></div>
             </div>
           </div>
@@ -227,7 +227,7 @@
                :data-anim="'culture-img'+(idx+1)"
                @click="openLightbox('culture-'+(idx+1), item.imageUrl)"
                :data-od-id="'culture-img-'+idx">
-            <img v-if="item.imageUrl" :src="getThumbSrc(item.imageUrl)" class="w-full aspect-[4/3] object-cover rounded-sm" alt="" loading="lazy" />
+            <img v-if="item.imageUrl" :src="getImgSrc(item.imageUrl)" class="w-full aspect-[4/3] object-cover rounded-sm" alt="" loading="lazy" />
             <div v-else class="ph-img aspect-[4/3]"><span class="text-warm-300/60">{{ item.imagePlaceholder }}</span></div>
           </div>
           <div :class="['lg:w-[45%] z-10 flex flex-col items-start space-y-5 bg-[var(--color-surface)] p-8 sm:p-10 slide-in-right',
@@ -266,7 +266,7 @@
                  data-anim="prod-peach-img"
                  @click="openLightbox('peach', products[0]?.imageUrl)"
                  data-od-id="product-img-peach">
-              <img v-if="products[0]?.imageUrl" :src="getThumbSrc(products[0].imageUrl)" class="w-full aspect-[4/3] lg:aspect-auto lg:h-[520px] object-cover rounded-sm" alt="" loading="lazy" />
+              <img v-if="products[0]?.imageUrl" :src="getImgSrc(products[0].imageUrl)" class="w-full aspect-[4/3] lg:aspect-auto lg:h-[520px] object-cover rounded-sm" alt="" loading="lazy" />
               <div v-else class="ph-img aspect-[4/3] lg:aspect-auto lg:h-[520px]"><span class="text-warm-300/60">{{ products[0]?.imagePlaceholder || '秦安水蜜桃 · 实地拍摄' }}</span></div>
             </div>
             <div class="lg:w-[50%] lg:-ml-16 lg:mt-28 z-10 flex flex-col justify-center space-y-6
@@ -300,7 +300,7 @@
                  data-anim="prod-pepper-img"
                  @click="openLightbox('pepper', products[1]?.imageUrl)"
                  data-od-id="product-img-pepper">
-              <img v-if="products[1]?.imageUrl" :src="getThumbSrc(products[1].imageUrl)" class="w-full aspect-[4/3] lg:aspect-auto lg:h-[480px] object-cover rounded-sm" alt="" loading="lazy" />
+              <img v-if="products[1]?.imageUrl" :src="getImgSrc(products[1].imageUrl)" class="w-full aspect-[4/3] lg:aspect-auto lg:h-[480px] object-cover rounded-sm" alt="" loading="lazy" />
               <div v-else class="ph-img aspect-[4/3] lg:aspect-auto lg:h-[480px]"><span class="text-warm-300/60">{{ products[1]?.imagePlaceholder || '秦安花椒 · 实地拍摄' }}</span></div>
             </div>
             <div class="lg:w-[52%] lg:-mr-12 lg:mt-24 z-10 flex flex-col justify-center space-y-6
@@ -366,7 +366,7 @@
                 :data-anim="'doc-img-' + i"
                 @click="openLightbox('doc-' + i, item.imageUrl)"
                 :data-od-id="'doc-photo-' + i">
-            <img v-if="item.imageUrl" :src="getThumbSrc(item.imageUrl)" class="w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
+            <img v-if="item.imageUrl" :src="getImgSrc(item.imageUrl)" class="w-full h-full object-cover rounded-sm" alt="" loading="lazy" />
             <div v-else class="doc-card-bg" :style="{ background: item.bg }">
               <span class="doc-card-emoji">{{ item.icon }}</span>
             </div>
@@ -522,7 +522,7 @@
     <section id="closing" class="section-container relative py-24 sm:py-32 lg:py-36 overflow-hidden" data-od-id="section-closing">
       <div class="absolute inset-0 overflow-hidden">
         <div class="absolute inset-0">
-          <img v-if="closingBgImage" :src="getThumbSrc(closingBgImage)" class="absolute inset-0 w-full h-full object-cover" alt="" />
+          <img v-if="closingBgImage" :src="getImgSrc(closingBgImage)" class="absolute inset-0 w-full h-full object-cover" alt="" />
           <div v-else class="ph-img absolute inset-0"><span class="text-warm-300/40">秦安大地 · 航拍全景</span></div>
         </div>
         <div class="absolute inset-0 bg-warm-900/35 backdrop-blur-[2px]"></div>
